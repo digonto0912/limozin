@@ -215,9 +215,11 @@ html {
 }
 
 .records-table th {
+  height: 72px;
+  padding: 0 1.25rem !important;
+  vertical-align: middle;
+  white-space: nowrap;
   background: #f8fafc;
-  padding: 1rem 1.25rem;
-  text-align: left;
   font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
@@ -246,11 +248,14 @@ html {
 }
 
 .records-table td {
-  padding: 1rem 1.25rem;
+  height: 72px;
+  padding: 0 1.25rem !important;
+  vertical-align: middle;
+  white-space: nowrap;
   font-size: 0.875rem;
   color: #374151;
   border-bottom: 1px solid #e5e7eb;
-  background: white;
+  background: transparent !important;
 }
 
 /* Row Highlighting - High visibility */
@@ -360,273 +365,30 @@ html {
   ) !important;
 }
 
-/* Reset background for td elements */
-.records-table td {
-  background: transparent !important;
+/* Table Row Consistency */
+.records-table tr {
+  height: 72px;
 }
 
-/* Action Buttons */
+/* Action cell specific height */
 .action-cell {
-  white-space: nowrap;
-  text-align: right;
-  padding: 0.5rem 1.25rem !important;
+  height: 72px !important;
+  padding: 0 1.25rem !important;
+  vertical-align: middle;
 }
 
 .action-buttons {
   display: inline-flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   align-items: center;
+  height: 100%;
 }
 
+/* Slightly larger buttons for taller rows */
 .edit-button, .delete-button {
-  width: 32px;
-  height: 32px;
-  padding: 0.4rem;
-  border-radius: 6px;
-  border: 1px solid;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-}
-
-.edit-button {
-  color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.delete-button {
-  color: var(--danger-color);
-  border-color: var(--danger-color);
-}
-
-.edit-button:hover {
-  background-color: var(--primary-color);
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(67, 97, 238, 0.2);
-}
-
-.delete-button:hover {
-  background-color: var(--danger-color);
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(230, 57, 70, 0.2);
-}
-
-.edit-button:active, .delete-button:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.edit-button svg, .delete-button svg {
-  width: 16px;
-  height: 16px;
-  stroke-width: 2;
-}
-
-/* Table Header Area */
-.table-toolbar {
-  padding: 1.25rem;
-  border-bottom: 1px solid #e5e7eb;
-  background: #ffffff;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 0.625rem 0.875rem;
-  transition: all 0.2s;
-}
-
-.search-box:focus-within {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-  background: white;
-}
-
-.search-icon {
-  width: 20px;
-  height: 20px;
-  color: #9ca3af;
-  margin-right: 0.75rem;
-}
-
-.search-input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  font-size: 0.875rem;
-  color: #1f2937;
-  outline: none;
-}
-
-.search-input::placeholder {
-  color: #9ca3af;
-}
-
-/* Table Styles */
-.records-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.records-table th {
-  background: #f8fafc;
-  padding: 1rem 1.25rem;
-  text-align: left;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  border-bottom: 1px solid #e5e7eb;
-  position: relative;
-}
-
-.records-table th.sortable {
-  cursor: pointer;
-  padding-right: 2.5rem;
-}
-
-.records-table th.sortable:hover {
-  background: #f1f5f9;
-}
-
-.sort-icon {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1rem;
-  height: 1rem;
-  color: #9ca3af;
-  transition: all 0.2s;
-}
-
-.records-table td {
-  padding: 1rem 1.25rem;
-  font-size: 0.875rem;
-  color: #374151;
-  border-bottom: 1px solid #e5e7eb;
-  background: white;
-}
-
-/* Row Highlighting - High visibility */
-.records-table tr.row-has-due {
-  background: rgba(239, 68, 68, 0.4) !important;
-}
-
-.records-table tr.row-expired-id {
-  background: rgba(249, 115, 22, 0.4) !important;
-}
-
-.records-table tr.row-expired-passport {
-  background: rgba(234, 179, 8, 0.4) !important;
-}
-
-/* Updated gradient order with high visibility */
-.records-table tr.row-due-and-id {
-  background: linear-gradient(135deg,
-    rgba(249, 115, 22, 0.4) 0%,
-    rgba(249, 115, 22, 0.4) 50%,
-    rgba(239, 68, 68, 0.4) 50%,
-    rgba(239, 68, 68, 0.4) 100%
-  ) !important;
-}
-
-.records-table tr.row-due-and-passport {
-  background: linear-gradient(135deg,
-    rgba(234, 179, 8, 0.4) 0%,
-    rgba(234, 179, 8, 0.4) 50%,
-    rgba(239, 68, 68, 0.4) 50%,
-    rgba(239, 68, 68, 0.4) 100%
-  ) !important;
-}
-
-.records-table tr.row-id-and-passport {
-  background: linear-gradient(135deg,
-    rgba(234, 179, 8, 0.4) 0%,
-    rgba(234, 179, 8, 0.4) 50%,
-    rgba(249, 115, 22, 0.4) 50%,
-    rgba(249, 115, 22, 0.4) 100%
-  ) !important;
-}
-
-.records-table tr.row-all-conditions {
-  background: linear-gradient(135deg,
-    rgba(234, 179, 8, 0.4) 0%,
-    rgba(234, 179, 8, 0.4) 33%,
-    rgba(249, 115, 22, 0.4) 33%,
-    rgba(249, 115, 22, 0.4) 66%,
-    rgba(239, 68, 68, 0.4) 66%,
-    rgba(239, 68, 68, 0.4) 100%
-  ) !important;
-}
-
-/* Make sure highlights persist on hover with updated gradient order */
-.records-table tr:hover {
-  background-color: inherit !important;
-}
-
-.records-table tr.row-has-due:hover {
-  background: rgba(239, 68, 68, 0.5) !important;
-}
-
-.records-table tr.row-expired-id:hover {
-  background: rgba(249, 115, 22, 0.5) !important;
-}
-
-.records-table tr.row-expired-passport:hover {
-  background: rgba(234, 179, 8, 0.5) !important;
-}
-
-.records-table tr.row-due-and-id:hover {
-  background: linear-gradient(135deg,
-    rgba(249, 115, 22, 0.5) 0%,
-    rgba(249, 115, 22, 0.5) 50%,
-    rgba(239, 68, 68, 0.5) 50%,
-    rgba(239, 68, 68, 0.5) 100%
-  ) !important;
-}
-
-.records-table tr.row-due-and-passport:hover {
-  background: linear-gradient(135deg,
-    rgba(234, 179, 8, 0.5) 0%,
-    rgba(234, 179, 8, 0.5) 50%,
-    rgba(239, 68, 68, 0.5) 50%,
-    rgba(239, 68, 68, 0.5) 100%
-  ) !important;
-}
-
-.records-table tr.row-id-and-passport:hover {
-  background: linear-gradient(135deg,
-    rgba(234, 179, 8, 0.5) 0%,
-    rgba(234, 179, 8, 0.5) 50%,
-    rgba(249, 115, 22, 0.5) 50%,
-    rgba(249, 115, 22, 0.5) 100%
-  ) !important;
-}
-
-.records-table tr.row-all-conditions:hover {
-  background: linear-gradient(135deg,
-    rgba(234, 179, 8, 0.5) 0%,
-    rgba(234, 179, 8, 0.5) 33%,
-    rgba(249, 115, 22, 0.5) 33%,
-    rgba(249, 115, 22, 0.5) 66%,
-    rgba(239, 68, 68, 0.5) 66%,
-    rgba(239, 68, 68, 0.5) 100%
-  ) !important;
-}
-
-/* Reset background for td elements */
-.records-table td {
-  background: transparent !important;
+  width: 36px;
+  height: 36px;
+  padding: 0.5rem;
 }
 
 /* Action Buttons */
