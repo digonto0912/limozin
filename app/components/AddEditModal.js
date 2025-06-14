@@ -17,6 +17,14 @@ export default function AddEditModal({ record = null, onClose, onSave }) {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Add modal-open class to body when modal is mounted
+  useEffect(() => {
+    document.body.classList.add('modal-open');
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, []);
+
   useEffect(() => {
     if (record) {
       setFormData({
