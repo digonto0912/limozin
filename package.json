@@ -8,17 +8,18 @@
     "frontend": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "node backend/scripts/seedData.js"
   },
   "dependencies": {
     "@firebase/app": "^0.13.1",
     "@firebase/firestore": "^4.7.17",
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
-    "@tailwindcss/forms": "^0.5.10",
     "chart.js": "^4.4.9",
     "concurrently": "^9.1.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "firebase": "^11.9.1",
     "moment": "^2.30.1",
@@ -30,11 +31,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@tailwindcss/postcss": "^4.1.10",
-    "autoprefixer": "^10.4.21",
     "eslint": "^9.29.0",
-    "eslint-config-next": "^15.3.3",
-    "postcss": "^8.5.5",
-    "tailwindcss": "^4.1.10"
+    "eslint-config-next": "^15.3.3"
   }
 }

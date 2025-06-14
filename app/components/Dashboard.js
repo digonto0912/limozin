@@ -1,19 +1,32 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Chart from './Chart';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import Table from './Table';
+import Chart from './Chart';
 import AddEditModal from './AddEditModal';
 import Loading from './Loading';
+import Header from './Header';
 
-export default function Dashboard() {
-  const [records, setRecords] = useState([]);
+export default function Dashboard({ 
+  isLoading, 
+  records, 
+  activeFilter, 
+  setActiveFilter,
+  showColorInfo, 
+  setShowColorInfo,
+  highlightEnabled,
+  setHighlightEnabled
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
 
   useEffect(() => {
     fetchRecords();
   }, []);
+
   const fetchRecords = async () => {
     try {
       setIsLoading(true);
@@ -26,103 +39,134 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Error fetching records:', error);
-      // For development, set empty array if API fails
+      showNotification('Failed to fetch records', 'error');
       setRecords([]);
     } finally {
       setIsLoading(false);
     }
   };
-  const handleSave = async (formData) => {
-    try {
-      let response;
-      if (editingRecord) {
-        // Update existing record
-        response = await fetch(`/api/record/${editingRecord.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-      } else {
-        // Add new record
-        response = await fetch('/api/record', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-      }
-      
-      if (response.ok) {
-        fetchRecords();
-        setEditingRecord(null);
-      } else {
-        throw new Error('Failed to save record');
-      }
-    } catch (error) {
-      console.error('Error saving record:', error);
-      alert('Error saving record. Please try again.');
-    }
+
+  const showNotification = (message, type = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
-  const handleDelete = async (id) => {
+
+  const handleAddRecord = () => {
+    setEditingRecord(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditRecord = (record) => {
+    setEditingRecord(record);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteRecord = async (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
-        const response = await fetch(`/api/record/${id}`, {
-          method: 'DELETE',
-        });
-        
+        const response = await fetch(`/api/record/${id}`, { method: 'DELETE' });
         if (response.ok) {
+          showNotification('Record deleted successfully');
           fetchRecords();
         } else {
           throw new Error('Failed to delete record');
         }
       } catch (error) {
-        console.error('Error deleting record:', error);
-        alert('Error deleting record. Please try again.');
+        showNotification('Failed to delete record', 'error');
       }
     }
   };
 
-  const handleEdit = (record) => {
-    setEditingRecord(record);
-    setIsModalOpen(true);
-  };
+  if (isLoading) return <Loading />;
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      {isLoading && <Loading />}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Business Monitoring Dashboard</h1>
+    <div className="dashboard">
+      <Header />
+      
+      <div className="button-group">
         <button
+          className="icon-button"
+          onClick={() => setHighlightEnabled(!highlightEnabled)}
+          title={highlightEnabled ? "Disable Row Highlighting" : "Enable Row Highlighting"}
+        >
+          <img 
+            src="/window.svg" 
+            alt="Toggle Highlighting"
+            style={{ opacity: highlightEnabled ? 1 : 0.5 }}
+          />
+        </button>
+        <button
+          className="icon-button"
+          onClick={() => setShowColorInfo(true)}
+          title="Show Color Information"
+        >
+          <InformationCircleIcon className="h-6 w-6" />
+        </button>
+        <button
+          className="add-button"
           onClick={() => {
             setEditingRecord(null);
             setIsModalOpen(true);
           }}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
         >
           Add New Record
         </button>
       </div>
 
-      <Chart data={records} />
-      
-      <Table
-        data={records}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {/* Main Content */}
+      <div className="dashboard-grid">
+        <div className="stat-card">
+          <h3>Total Records</h3>
+          <div className="value">{records.length}</div>
+        </div>
+        <div className="stat-card">
+          <h3>Expired Passports</h3>
+          <div className="value">{records.filter(r => new Date(r.passportExpiry) < new Date()).length}</div>
+        </div>
+        <div className="stat-card">
+          <h3>Expired IDs</h3>
+          <div className="value">{records.filter(r => new Date(r.idExpiry) < new Date()).length}</div>
+        </div>
+        <div className="stat-card">
+          <h3>Total Due Balance</h3>
+          <div className="value"> ﷼ {records.reduce((sum, r) => sum + (r.dueBalance || 0), 0).toLocaleString()}</div>
+        </div>
+      </div>
 
-      <AddEditModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingRecord(null);
-        }}
-        onSave={handleSave}
-        record={editingRecord}
-      />
-    </main>
+      <div className="card chart-container">
+        <Chart records={records} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+      </div>
+
+      <div className="card">
+        <Table 
+          records={records} 
+          onEdit={handleEditRecord}
+          onDelete={handleDeleteRecord}
+          highlightEnabled={highlightEnabled}
+          showColorInfo={showColorInfo}
+          onColorInfoClose={() => setShowColorInfo(true)}
+        />
+      </div>
+
+      {isModalOpen && (
+        <AddEditModal
+          record={editingRecord}
+          onClose={() => setIsModalOpen(false)}
+          onSave={() => {
+            fetchRecords();
+            setIsModalOpen(false);
+            showNotification(editingRecord ? 'Record updated successfully' : 'Record added successfully');
+          }}
+        />
+      )}
+
+      {showToast && (
+        <div className={`toast toast-${toastType}`}>
+          {toastType === 'success' ? '✅' : '❌'} {toastMessage}
+        </div>
+      )}
+    </div>
   );
 }

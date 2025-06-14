@@ -25,13 +25,16 @@ const chartTypes = [
   { id: 'expiry', name: 'Expiring Documents' }
 ];
 
-export default function Chart({ data = [] }) {
+export default function Chart({ records = [] }) {
   const [chartType, setChartType] = useState('due');
 
+  const handleChartTypeChange = (type) => {
+    setChartType(type);
+  };
   const getChartData = () => {
     if (chartType === 'due') {
       // Get top 10 due balances
-      const sortedData = [...data]
+      const sortedData = [...records]
         .filter(record => record.dueBalance > 0)
         .sort((a, b) => b.dueBalance - a.dueBalance)
         .slice(0, 10);
@@ -40,43 +43,58 @@ export default function Chart({ data = [] }) {
         labels: sortedData.map(record => record.name),
         datasets: [
           {
-            label: 'Due Balance ($)',
+            label: 'Due Balance ( ﷼ )',
             data: sortedData.map(record => record.dueBalance),
-            backgroundColor: 'rgba(79, 70, 229, 0.8)',
-            borderColor: 'rgb(79, 70, 229)',
+            backgroundColor: 'rgba(220, 38, 38, 0.8)', // Red for due balance
+            borderColor: 'rgb(220, 38, 38)',
             borderWidth: 1,
           },
         ],
       };
     } else {
-      // Count of documents expiring in next 3 months
+      // Get expired and expiring documents counts
       const now = new Date();
-      const threeMonths = new Date();
-      threeMonths.setMonth(threeMonths.getMonth() + 3);
-
-      const expiringPassports = data.filter(record => 
-        new Date(record.passportExpiry) > now && 
-        new Date(record.passportExpiry) <= threeMonths
+      
+      // Count expired documents
+      const expiredPassports = records.filter(record => 
+        record.passportExpiry && new Date(record.passportExpiry) < now
       ).length;
 
-      const expiringIds = data.filter(record => 
-        new Date(record.idExpiry) > now && 
-        new Date(record.idExpiry) <= threeMonths
+      const expiredIds = records.filter(record => 
+        record.idExpiry && new Date(record.idExpiry) < now
       ).length;
 
-      return {
-        labels: ['Passports', 'IDs'],
+      // Count documents expiring in next 30 days
+      const thirtyDays = new Date();
+      thirtyDays.setDate(thirtyDays.getDate() + 30);
+
+      const expiringPassports = records.filter(record => 
+        record.passportExpiry &&
+        new Date(record.passportExpiry) >= now && 
+        new Date(record.passportExpiry) <= thirtyDays
+      ).length;
+
+      const expiringIds = records.filter(record => 
+        record.idExpiry &&
+        new Date(record.idExpiry) >= now && 
+        new Date(record.idExpiry) <= thirtyDays
+      ).length;      return {
+        labels: ['Expired Passports', 'Expiring Passports', 'Expired IDs', 'Expiring IDs'],
         datasets: [
           {
-            label: 'Documents Expiring Soon',
-            data: [expiringPassports, expiringIds],
+            label: 'Document Status',
+            data: [expiredPassports, expiringPassports, expiredIds, expiringIds],
             backgroundColor: [
-              'rgba(220, 38, 38, 0.8)',
-              'rgba(234, 179, 8, 0.8)',
+              'rgba(234, 179, 8, 0.8)',    // Yellow for expired passports
+              'rgba(234, 179, 8, 0.4)',    // Light yellow for expiring passports
+              'rgba(249, 115, 22, 0.8)',   // Orange for expired IDs
+              'rgba(249, 115, 22, 0.4)',   // Light orange for expiring IDs
             ],
             borderColor: [
-              'rgb(220, 38, 38)',
-              'rgb(234, 179, 8)',
+              'rgb(234, 179, 8)',    // Yellow
+              'rgb(234, 179, 8)',    // Yellow
+              'rgb(249, 115, 22)',   // Orange
+              'rgb(249, 115, 22)',   // Orange
             ],
             borderWidth: 1,
           },
@@ -84,22 +102,32 @@ export default function Chart({ data = [] }) {
       };
     }
   };
-
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
+        display: false, // Hide legend since we use different colors for statuses
       },
       title: {
         display: true,
-        text: chartType === 'due' ? 'Top Due Balances' : 'Documents Expiring in Next 3 Months',
+        text: chartType === 'due' ? 'Top Due Balances' : 'Document Status Overview',
         font: {
           size: 16,
           weight: 'bold',
         },
       },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            if (chartType === 'due') {
+              return ' ﷼  ' + context.raw.toLocaleString();
+            }
+            return context.raw + ' records';
+          }
+        }
+      }
     },
     scales: {
       y: {
@@ -107,7 +135,7 @@ export default function Chart({ data = [] }) {
         ticks: {
           callback: function(value) {
             if (chartType === 'due') {
-              return '$' + value;
+              return ' ﷼  ' + value.toLocaleString();
             }
             return value;
           }
@@ -115,33 +143,23 @@ export default function Chart({ data = [] }) {
       }
     }
   };
-
   return (
-    <div className="w-full">
-      <div className="mb-4 flex justify-end">
-        <div className="inline-flex rounded-md shadow-sm" role="group">
+    <div style={{ width: '100%' }}>
+      <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+        <div className="chart-buttons" role="group">
           {chartTypes.map((type) => (
             <button
               key={type.id}
               type="button"
               onClick={() => setChartType(type.id)}
-              className={`
-                px-4 py-2 text-sm font-medium
-                ${type.id === chartType
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50'
-                }
-                ${type.id === 'due' ? 'rounded-l-lg' : 'rounded-r-lg'}
-                border border-gray-200
-                focus:z-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none
-              `}
+              className={`chart-button ${type.id === chartType ? 'active' : ''}`}
             >
               {type.name}
             </button>
           ))}
         </div>
       </div>
-      <div className="h-[400px]">
+      <div style={{ height: '400px' }}>
         <Bar data={getChartData()} options={options} />
       </div>
     </div>

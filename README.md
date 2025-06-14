@@ -83,9 +83,9 @@ erp-monitoring-app/
 * Search/filter by name, phone, expiry, dues
 * Row highlighting:
 
-  * 🔴 Red: Expired Passport
-  * 🟠 Yellow: Expired ID
-  * 💰 Blue: Due Balance > 0
+  * 🔴 Red for due balance
+  * 🟠 Orange for expired ID
+  * 💛 Yellow for expired passport
 * Row Actions:
 
   * 🖊️ Edit
@@ -249,7 +249,7 @@ Let the admin:
 | ID Expiry       | Date     | `idExpiry`       | Optional    |
 | Join Date       | Date     | `joinDate`       | Optional    |
 | Phone Number    | Text     | `phone`          | Optional    |
-| Due Balance (৳) | Number   | `dueBalance`     | Default = 0 |
+| Due Balance ( ﷼ ) | Number   | `dueBalance`     | Default = 0 |
 | Notes           | Textarea | `notes`          | Optional    |
 
 ### ✅ Form Validation
