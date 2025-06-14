@@ -253,109 +253,110 @@ html {
   background: white;
 }
 
-/* Row Highlighting - Fixed */
+/* Row Highlighting - High visibility */
 .records-table tr.row-has-due {
-  background: rgba(239, 68, 68, 0.15) !important;
+  background: rgba(239, 68, 68, 0.4) !important;
 }
 
 .records-table tr.row-expired-id {
-  background: rgba(249, 115, 22, 0.15) !important;
+  background: rgba(249, 115, 22, 0.4) !important;
 }
 
 .records-table tr.row-expired-passport {
-  background: rgba(234, 179, 8, 0.15) !important;
+  background: rgba(234, 179, 8, 0.4) !important;
 }
 
+/* Updated gradient order with high visibility */
 .records-table tr.row-due-and-id {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.15) 0%,
-    rgba(239, 68, 68, 0.15) 50%,
-    rgba(249, 115, 22, 0.15) 50%,
-    rgba(249, 115, 22, 0.15) 100%
+    rgba(249, 115, 22, 0.4) 0%,
+    rgba(249, 115, 22, 0.4) 50%,
+    rgba(239, 68, 68, 0.4) 50%,
+    rgba(239, 68, 68, 0.4) 100%
   ) !important;
 }
 
 .records-table tr.row-due-and-passport {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.15) 0%,
-    rgba(239, 68, 68, 0.15) 50%,
-    rgba(234, 179, 8, 0.15) 50%,
-    rgba(234, 179, 8, 0.15) 100%
+    rgba(234, 179, 8, 0.4) 0%,
+    rgba(234, 179, 8, 0.4) 50%,
+    rgba(239, 68, 68, 0.4) 50%,
+    rgba(239, 68, 68, 0.4) 100%
   ) !important;
 }
 
 .records-table tr.row-id-and-passport {
   background: linear-gradient(135deg,
-    rgba(249, 115, 22, 0.15) 0%,
-    rgba(249, 115, 22, 0.15) 50%,
-    rgba(234, 179, 8, 0.15) 50%,
-    rgba(234, 179, 8, 0.15) 100%
+    rgba(234, 179, 8, 0.4) 0%,
+    rgba(234, 179, 8, 0.4) 50%,
+    rgba(249, 115, 22, 0.4) 50%,
+    rgba(249, 115, 22, 0.4) 100%
   ) !important;
 }
 
 .records-table tr.row-all-conditions {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.15) 0%,
-    rgba(239, 68, 68, 0.15) 33%,
-    rgba(249, 115, 22, 0.15) 33%,
-    rgba(249, 115, 22, 0.15) 66%,
-    rgba(234, 179, 8, 0.15) 66%,
-    rgba(234, 179, 8, 0.15) 100%
+    rgba(234, 179, 8, 0.4) 0%,
+    rgba(234, 179, 8, 0.4) 33%,
+    rgba(249, 115, 22, 0.4) 33%,
+    rgba(249, 115, 22, 0.4) 66%,
+    rgba(239, 68, 68, 0.4) 66%,
+    rgba(239, 68, 68, 0.4) 100%
   ) !important;
 }
 
-/* Make sure highlights persist on hover */
+/* Make sure highlights persist on hover with updated gradient order */
 .records-table tr:hover {
   background-color: inherit !important;
 }
 
 .records-table tr.row-has-due:hover {
-  background: rgba(239, 68, 68, 0.2) !important;
+  background: rgba(239, 68, 68, 0.5) !important;
 }
 
 .records-table tr.row-expired-id:hover {
-  background: rgba(249, 115, 22, 0.2) !important;
+  background: rgba(249, 115, 22, 0.5) !important;
 }
 
 .records-table tr.row-expired-passport:hover {
-  background: rgba(234, 179, 8, 0.2) !important;
+  background: rgba(234, 179, 8, 0.5) !important;
 }
 
 .records-table tr.row-due-and-id:hover {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.2) 0%,
-    rgba(239, 68, 68, 0.2) 50%,
-    rgba(249, 115, 22, 0.2) 50%,
-    rgba(249, 115, 22, 0.2) 100%
+    rgba(249, 115, 22, 0.5) 0%,
+    rgba(249, 115, 22, 0.5) 50%,
+    rgba(239, 68, 68, 0.5) 50%,
+    rgba(239, 68, 68, 0.5) 100%
   ) !important;
 }
 
 .records-table tr.row-due-and-passport:hover {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.2) 0%,
-    rgba(239, 68, 68, 0.2) 50%,
-    rgba(234, 179, 8, 0.2) 50%,
-    rgba(234, 179, 8, 0.2) 100%
+    rgba(234, 179, 8, 0.5) 0%,
+    rgba(234, 179, 8, 0.5) 50%,
+    rgba(239, 68, 68, 0.5) 50%,
+    rgba(239, 68, 68, 0.5) 100%
   ) !important;
 }
 
 .records-table tr.row-id-and-passport:hover {
   background: linear-gradient(135deg,
-    rgba(249, 115, 22, 0.2) 0%,
-    rgba(249, 115, 22, 0.2) 50%,
-    rgba(234, 179, 8, 0.2) 50%,
-    rgba(234, 179, 8, 0.2) 100%
+    rgba(234, 179, 8, 0.5) 0%,
+    rgba(234, 179, 8, 0.5) 50%,
+    rgba(249, 115, 22, 0.5) 50%,
+    rgba(249, 115, 22, 0.5) 100%
   ) !important;
 }
 
 .records-table tr.row-all-conditions:hover {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.2) 0%,
-    rgba(239, 68, 68, 0.2) 33%,
-    rgba(249, 115, 22, 0.2) 33%,
-    rgba(249, 115, 22, 0.2) 66%,
-    rgba(234, 179, 8, 0.2) 66%,
-    rgba(234, 179, 8, 0.2) 100%
+    rgba(234, 179, 8, 0.5) 0%,
+    rgba(234, 179, 8, 0.5) 33%,
+    rgba(249, 115, 22, 0.5) 33%,
+    rgba(249, 115, 22, 0.5) 66%,
+    rgba(239, 68, 68, 0.5) 66%,
+    rgba(239, 68, 68, 0.5) 100%
   ) !important;
 }
 
@@ -516,109 +517,110 @@ html {
   background: white;
 }
 
-/* Row Highlighting - Fixed */
+/* Row Highlighting - High visibility */
 .records-table tr.row-has-due {
-  background: rgba(239, 68, 68, 0.15) !important;
+  background: rgba(239, 68, 68, 0.4) !important;
 }
 
 .records-table tr.row-expired-id {
-  background: rgba(249, 115, 22, 0.15) !important;
+  background: rgba(249, 115, 22, 0.4) !important;
 }
 
 .records-table tr.row-expired-passport {
-  background: rgba(234, 179, 8, 0.15) !important;
+  background: rgba(234, 179, 8, 0.4) !important;
 }
 
+/* Updated gradient order with high visibility */
 .records-table tr.row-due-and-id {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.15) 0%,
-    rgba(239, 68, 68, 0.15) 50%,
-    rgba(249, 115, 22, 0.15) 50%,
-    rgba(249, 115, 22, 0.15) 100%
+    rgba(249, 115, 22, 0.4) 0%,
+    rgba(249, 115, 22, 0.4) 50%,
+    rgba(239, 68, 68, 0.4) 50%,
+    rgba(239, 68, 68, 0.4) 100%
   ) !important;
 }
 
 .records-table tr.row-due-and-passport {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.15) 0%,
-    rgba(239, 68, 68, 0.15) 50%,
-    rgba(234, 179, 8, 0.15) 50%,
-    rgba(234, 179, 8, 0.15) 100%
+    rgba(234, 179, 8, 0.4) 0%,
+    rgba(234, 179, 8, 0.4) 50%,
+    rgba(239, 68, 68, 0.4) 50%,
+    rgba(239, 68, 68, 0.4) 100%
   ) !important;
 }
 
 .records-table tr.row-id-and-passport {
   background: linear-gradient(135deg,
-    rgba(249, 115, 22, 0.15) 0%,
-    rgba(249, 115, 22, 0.15) 50%,
-    rgba(234, 179, 8, 0.15) 50%,
-    rgba(234, 179, 8, 0.15) 100%
+    rgba(234, 179, 8, 0.4) 0%,
+    rgba(234, 179, 8, 0.4) 50%,
+    rgba(249, 115, 22, 0.4) 50%,
+    rgba(249, 115, 22, 0.4) 100%
   ) !important;
 }
 
 .records-table tr.row-all-conditions {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.15) 0%,
-    rgba(239, 68, 68, 0.15) 33%,
-    rgba(249, 115, 22, 0.15) 33%,
-    rgba(249, 115, 22, 0.15) 66%,
-    rgba(234, 179, 8, 0.15) 66%,
-    rgba(234, 179, 8, 0.15) 100%
+    rgba(234, 179, 8, 0.4) 0%,
+    rgba(234, 179, 8, 0.4) 33%,
+    rgba(249, 115, 22, 0.4) 33%,
+    rgba(249, 115, 22, 0.4) 66%,
+    rgba(239, 68, 68, 0.4) 66%,
+    rgba(239, 68, 68, 0.4) 100%
   ) !important;
 }
 
-/* Make sure highlights persist on hover */
+/* Make sure highlights persist on hover with updated gradient order */
 .records-table tr:hover {
   background-color: inherit !important;
 }
 
 .records-table tr.row-has-due:hover {
-  background: rgba(239, 68, 68, 0.2) !important;
+  background: rgba(239, 68, 68, 0.5) !important;
 }
 
 .records-table tr.row-expired-id:hover {
-  background: rgba(249, 115, 22, 0.2) !important;
+  background: rgba(249, 115, 22, 0.5) !important;
 }
 
 .records-table tr.row-expired-passport:hover {
-  background: rgba(234, 179, 8, 0.2) !important;
+  background: rgba(234, 179, 8, 0.5) !important;
 }
 
 .records-table tr.row-due-and-id:hover {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.2) 0%,
-    rgba(239, 68, 68, 0.2) 50%,
-    rgba(249, 115, 22, 0.2) 50%,
-    rgba(249, 115, 22, 0.2) 100%
+    rgba(249, 115, 22, 0.5) 0%,
+    rgba(249, 115, 22, 0.5) 50%,
+    rgba(239, 68, 68, 0.5) 50%,
+    rgba(239, 68, 68, 0.5) 100%
   ) !important;
 }
 
 .records-table tr.row-due-and-passport:hover {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.2) 0%,
-    rgba(239, 68, 68, 0.2) 50%,
-    rgba(234, 179, 8, 0.2) 50%,
-    rgba(234, 179, 8, 0.2) 100%
+    rgba(234, 179, 8, 0.5) 0%,
+    rgba(234, 179, 8, 0.5) 50%,
+    rgba(239, 68, 68, 0.5) 50%,
+    rgba(239, 68, 68, 0.5) 100%
   ) !important;
 }
 
 .records-table tr.row-id-and-passport:hover {
   background: linear-gradient(135deg,
-    rgba(249, 115, 22, 0.2) 0%,
-    rgba(249, 115, 22, 0.2) 50%,
-    rgba(234, 179, 8, 0.2) 50%,
-    rgba(234, 179, 8, 0.2) 100%
+    rgba(234, 179, 8, 0.5) 0%,
+    rgba(234, 179, 8, 0.5) 50%,
+    rgba(249, 115, 22, 0.5) 50%,
+    rgba(249, 115, 22, 0.5) 100%
   ) !important;
 }
 
 .records-table tr.row-all-conditions:hover {
   background: linear-gradient(135deg,
-    rgba(239, 68, 68, 0.2) 0%,
-    rgba(239, 68, 68, 0.2) 33%,
-    rgba(249, 115, 22, 0.2) 33%,
-    rgba(249, 115, 22, 0.2) 66%,
-    rgba(234, 179, 8, 0.2) 66%,
-    rgba(234, 179, 8, 0.2) 100%
+    rgba(234, 179, 8, 0.5) 0%,
+    rgba(234, 179, 8, 0.5) 33%,
+    rgba(249, 115, 22, 0.5) 33%,
+    rgba(249, 115, 22, 0.5) 66%,
+    rgba(239, 68, 68, 0.5) 66%,
+    rgba(239, 68, 68, 0.5) 100%
   ) !important;
 }
 
