@@ -1,36 +1,309 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 📘 Business Monitoring ERP — Full System Documentation
 
-## Getting Started
+> A minimal ERP-style system for tracking employee/customer documents and payment dues. Designed for a single business owner who needs clarity and peace of mind about ongoing records.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🧠 1. Purpose
+
+This system is designed to **reduce mental burden** for a business owner (your uncle) who currently remembers everything manually—from payment collections to document expiry tracking.
+
+It will:
+
+* Track important data (e.g., passport/ID expiry dates, payment dues)
+* Highlight issues (like expired passports or unpaid dues)
+* Display a clean **dashboard** with charts and tables for quick insights
+
+---
+
+## 💻 2. Tech Stack
+
+| Layer         | Technology                               |
+| ------------- | ---------------------------------------- |
+| Frontend      | Next.js + Tailwind CSS                   |
+| Chart Library | Chart.js / Recharts                      |
+| Backend API   | Node.js + Express.js                     |
+| Database      | Firebase Firestore                       |
+| Hosting       | Firebase Hosting or Vercel (for Next.js) |
+
+---
+
+## 🔐 3. Authentication
+
+* ❌ No login system required initially
+* Future option: Firebase Auth (admin-only access)
+
+---
+
+## 📂 4. Folder Structure (Recommendation)
+
+```
+erp-monitoring-app/
+├── backend/
+│   ├── server.js
+│   ├── routes/
+│   │   └── records.js
+│   └── firebase/
+│       └── firestore.js
+├── frontend/
+│   ├── pages/
+│   │   └── index.tsx
+│   ├── components/
+│   │   ├── Table.tsx
+│   │   ├── Chart.tsx
+│   │   └── AddEditModal.tsx
+│   ├── styles/
+│   │   └── globals.css
+│   └── utils/
+│       └── api.ts
+├── README.md
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 📊 5. Dashboard (UI)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 5.1 Chart Summary (Top Section)
 
-## Learn More
+* Bar or Pie Chart displaying:
 
-To learn more about Next.js, take a look at the following resources:
+  * 🔴 Expired Passports
+  * 🟠 Expired IDs
+  * 🟡 Total Due Amount
+  * 🟢 Total Records
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 5.2 Record Table (Below Chart)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Name | Passport Expiry | ID No. | ID Expiry | Join Date | Phone | Due Balance | Notes |
+| ---- | --------------- | ------ | --------- | --------- | ----- | ----------- | ----- |
 
-## Deploy on Vercel
+#### Features:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Search/filter by name, phone, expiry, dues
+* Row highlighting:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+  * 🔴 Red: Expired Passport
+  * 🟠 Yellow: Expired ID
+  * 💰 Blue: Due Balance > 0
+* Row Actions:
+
+  * 🖊️ Edit
+  * ❌ Delete
+  * ➕ Add (Modal)
+
+---
+
+## 🔁 6. Backend API (Node.js + Express)
+
+### Base URL
+
+```
+front-end: http://localhost:3001/api
+backend-end: http://localhost:3002/api
+```
+
+### Routes
+
+| Method | Endpoint      | Description            |
+| ------ | ------------- | ---------------------- |
+| GET    | `/records`    | Get all records        |
+| POST   | `/record`     | Create new record      |
+| PUT    | `/record/:id` | Update existing record |
+| DELETE | `/record/:id` | Delete a record        |
+
+---
+
+## 🔌 7. Firebase Firestore (Database)
+
+### Collection: `records`
+
+#### Example Document:
+
+```json
+{
+  "name": "Rahim Uddin",
+  "passportExpiry": "2025-11-10",
+  "idNumber": "1234567890",
+  "idExpiry": "2026-03-15",
+  "joinDate": "2022-06-12",
+  "phone": "017xxxxxxxx",
+  "dueBalance": 15000,
+  "notes": "Delayed payment",
+  "createdAt": "timestamp",
+  "updatedAt": "timestamp"
+}
+```
+
+---
+
+## 🧰 8. Frontend (Next.js)
+
+### `/` (Dashboard)
+
+* Loads data from the backend
+* Displays:
+
+  * `<Chart />` summary
+  * `<Table />` with actions
+  * `<AddEditModal />` form
+
+---
+
+## 🧱 9. Components (Frontend)
+
+### `<Chart />`
+
+* Visualizes:
+
+  * Expired passports/IDs
+  * Total dues
+  * Record count
+
+### `<Table />`
+
+* Displays records
+* Highlights rows
+* Includes edit/delete
+
+### `<AddEditModal />`
+
+* Reusable form for Add/Edit
+* Fields:
+
+  * Name, Passport Expiry, ID Number, ID Expiry, Join Date, Phone, Due Balance, Notes
+
+---
+
+## 🔄 10. Data Flow
+
+1. Dashboard loads: calls `GET /records`
+2. Chart computes summaries
+3. Table renders data
+4. Add/Edit/Delete use modal form
+5. Backend updates Firestore
+6. Frontend refreshes data
+
+---
+
+## 📦 11. Deployment
+
+* **Frontend**: Vercel or Firebase Hosting
+* **Backend**: Firebase Cloud Functions or Render
+* **Database**: Firebase Firestore (free tier is sufficient)
+
+---
+
+## 🛠️ 12. Future Enhancements
+
+* Admin login (Firebase Auth)
+* Export to Excel/CSV
+* Reminders (email/SMS)
+* Mobile version (React Native)
+
+---
+
+## ✅ 13. Dev Checklist
+
+* [ ] Setup Firebase Firestore project
+* [ ] Configure Node.js backend and API
+* [ ] Build Next.js frontend (Chart + Table)
+* [ ] Test Add/Edit/Delete workflows
+* [ ] Implement row highlights
+* [ ] Ensure chart auto-updates
+* [ ] Deploy to hosting
+
+---
+
+## 📋 14. Example Data (For Seeding)
+
+| Name        | Passport Expiry | ID No.     | ID Expiry  | Join Date  | Phone       | Due Balance | Notes           |
+| ----------- | --------------- | ---------- | ---------- | ---------- | ----------- | ----------- | --------------- |
+| Rahim Uddin | 2025-11-10      | 1234567890 | 2026-03-15 | 2022-06-12 | 01712345678 | 15000       | Delayed payment |
+| Karim Ali   | 2024-07-01      | 9876543210 | 2024-09-12 | 2021-03-22 | 01876543210 | 0           | All good        |
+
+---
+
+## 📟 15. Input System (Add/Edit Record)
+
+### 📌 Purpose
+
+Let the admin:
+
+* Add new customer/worker
+* Edit existing data
+* Use modal popup (no page reload)
+
+### 🚟 Modal Form Behavior
+
+* ➕ Add New Record → Opens in **add mode**
+* 🖊️ Edit → Opens in **edit mode** with filled data
+
+### 📄 Form Fields
+
+| Label           | Input    | Field Name       | Validation  |
+| --------------- | -------- | ---------------- | ----------- |
+| Name            | Text     | `name`           | Required    |
+| Passport Expiry | Date     | `passportExpiry` | Optional    |
+| ID Number       | Text     | `idNumber`       | Optional    |
+| ID Expiry       | Date     | `idExpiry`       | Optional    |
+| Join Date       | Date     | `joinDate`       | Optional    |
+| Phone Number    | Text     | `phone`          | Optional    |
+| Due Balance (৳) | Number   | `dueBalance`     | Default = 0 |
+| Notes           | Textarea | `notes`          | Optional    |
+
+### ✅ Form Validation
+
+* Name is **required**
+* `dueBalance` must be a number (can be 0)
+* Use date pickers
+* Validate phone (nice to have)
+
+### 📤 Form Actions
+
+| Action | Behavior |
+| ------ | -------- |
+| Submit | Calls:   |
+
+```
+        * `POST /record` (new)
+        * `PUT /record/:id` (edit)
+```
+
+\| Cancel   | Closes modal without saving                             |
+
+### 🔄 API Integration
+
+```ts
+// Add
+fetch('/api/record', {
+  method: 'POST',
+  body: JSON.stringify(formData),
+  headers: { 'Content-Type': 'application/json' }
+});
+
+// Edit
+fetch(`/api/record/${recordId}`, {
+  method: 'PUT',
+  body: JSON.stringify(updatedFormData),
+  headers: { 'Content-Type': 'application/json' }
+});
+```
+
+### 🎨 UX Notes
+
+* Modal should animate smoothly
+* Show loading spinner or "Saving..."
+* On success: close modal and refresh
+* Show toast message like: “✅ Record saved successfully”
+
+### 🖼️ Inline Add Button
+
+```html
+<button class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+  ➕ Add New Record
+</button>
+```
+
+---
+"# limozin" 
