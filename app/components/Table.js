@@ -5,7 +5,6 @@ import {
   ChevronUpDownIcon,
   PencilSquareIcon,
   TrashIcon,
-  InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import moment from "moment";
 
@@ -114,18 +113,7 @@ export default function Table({
     });
   };
 
-  // Filter records
-  const filteredRecords = getSortedRecords().filter(record => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      record.name?.toLowerCase().includes(searchLower) ||
-      record.idNumber?.toLowerCase().includes(searchLower) ||
-      record.phone?.toLowerCase().includes(searchLower) ||
-      (record.dueBalance && record.dueBalance.toString().includes(searchTerm))
-    );
-  });
-
-  const getRowClass = (record) => {
+  const getHighlightClass = (record) => {
     if (!highlightEnabled) return '';
     
     const now = new Date();
@@ -133,7 +121,6 @@ export default function Table({
     const hasExpiredId = record.idExpiry && new Date(record.idExpiry) < now;
     const hasExpiredPassport = record.passportExpiry && new Date(record.passportExpiry) < now;
 
-    // Return appropriate class based on conditions
     if (hasDue && hasExpiredId && hasExpiredPassport) return 'row-all-conditions';
     if (hasDue && hasExpiredId) return 'row-due-and-id';
     if (hasDue && hasExpiredPassport) return 'row-due-and-passport';
@@ -145,6 +132,17 @@ export default function Table({
     return '';
   };
 
+  // Filter records
+  const filteredRecords = getSortedRecords().filter(record => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      record.name?.toLowerCase().includes(searchLower) ||
+      record.idNumber?.toLowerCase().includes(searchLower) ||
+      record.phone?.toLowerCase().includes(searchLower) ||
+      (record.dueBalance && record.dueBalance.toString().includes(searchTerm))
+    );
+  });
+
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -154,9 +152,29 @@ export default function Table({
     }
   };
 
+  const ActionButtons = ({ record }) => (
+    <div className="action-buttons">
+      <button
+        onClick={() => onEdit(record)}
+        className="edit-button"
+        title="Edit Record"
+      >
+        <PencilSquareIcon className="h-4 w-4" />
+      </button>
+      <button
+        onClick={() => onDelete(record.id)}
+        className="delete-button"
+        title="Delete Record"
+      >
+        <TrashIcon className="h-4 w-4" />
+      </button>
+    </div>
+  );
+
   return (
     <div className="table-container">
-      <div className="table-toolbar">
+      {/* Single Search Input for both views */}
+      <div className="search-container">
         <div className="search-box">
           <MagnifyingGlassIcon className="search-icon" />
           <input
@@ -169,6 +187,7 @@ export default function Table({
         </div>
       </div>
 
+      {/* Table View (Tablet and up) */}
       <div style={{ overflowX: 'auto', width: '100%' }}>
         <table className="records-table">
           <thead>
@@ -176,7 +195,7 @@ export default function Table({
               {columns.map((column) => (
                 <th
                   key={column.field}
-                  onClick={() => handleSort(column.field)}
+                  onClick={() => column.sortable && handleSort(column.field)}
                   className={`${column.sortable ? 'sortable' : ''} ${sortField === column.field ? 'sorted' : ''}`}
                 >
                   {column.label}
@@ -202,7 +221,7 @@ export default function Table({
               </tr>
             ) : (
               filteredRecords.map((record) => (
-                <tr key={record.id} className={getRowClass(record)}>
+                <tr key={record.id} className={getHighlightClass(record)}>
                   <td>{record.name}</td>
                   <td>
                     <span className={record.passportExpiry && new Date(record.passportExpiry) < new Date() ? 'text-amber-600 font-medium' : ''}>
@@ -223,28 +242,42 @@ export default function Table({
                     </span>
                   </td>
                   <td className="action-cell">
-                    <div className="action-buttons">
-                      <button
-                        onClick={() => onEdit(record)}
-                        className="edit-button"
-                        title="Edit Record"
-                      >
-                        <PencilSquareIcon className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => onDelete(record.id)}
-                        className="delete-button"
-                        title="Delete Record"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <ActionButtons record={record} />
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="mobile-cards">
+        {filteredRecords.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+            No records found
+          </div>
+        ) : (
+          filteredRecords.map((record) => (
+            <div key={record.id} className={`record-card ${getHighlightClass(record)}`}>
+              {columns.map((column) => (
+                <div key={column.field} className="card-field">
+                  <span className="field-label">{column.label}:</span>
+                  <span className="field-value">
+                    {column.field === 'dueBalance'
+                      ? (record.dueBalance ? '৳' + record.dueBalance.toLocaleString() : '৳0')
+                      : ['passportExpiry', 'idExpiry', 'joinDate'].includes(column.field)
+                        ? formatDate(record[column.field])
+                        : record[column.field]}
+                  </span>
+                </div>
+              ))}
+              <div className="card-actions">
+                <ActionButtons record={record} />
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <ColorInfo isOpen={showColorInfo} onClose={onColorInfoClose} />
