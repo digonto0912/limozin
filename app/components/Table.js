@@ -238,7 +238,7 @@ export default function Table({
                   <td>{record.phone}</td>
                   <td>
                     <span className={record.dueBalance > 0 ? 'text-red-600 font-medium' : ''}>
-                      {record.dueBalance ? '৳' + record.dueBalance.toLocaleString() : '৳0'}
+                      {record.dueBalance ? ' ﷼ ' + record.dueBalance.toLocaleString() : ' ﷼ 0'}
                     </span>
                   </td>
                   <td className="action-cell">
@@ -265,7 +265,7 @@ export default function Table({
                   <span className="field-label">{column.label}:</span>
                   <span className="field-value">
                     {column.field === 'dueBalance'
-                      ? (record.dueBalance ? '৳' + record.dueBalance.toLocaleString() : '৳0')
+                      ? (record.dueBalance ? ' ﷼ ' + record.dueBalance.toLocaleString() : ' ﷼ 0')
                       : ['passportExpiry', 'idExpiry', 'joinDate'].includes(column.field)
                         ? formatDate(record[column.field])
                         : record[column.field]}
