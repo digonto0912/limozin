@@ -5,12 +5,12 @@
   "scripts": {
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
     "backend": "nodemon backend/server.js",
-    "frontend": "next dev -p 3001",
+    "frontend": "next dev -p 3003",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "seed": "node backend/scripts/seedData.js",
-    "vercel-build": "next build"
+    "vercel-build": "next build && cp -r backend ."
   },
   "dependencies": {
     "@firebase/app": "^0.13.1",

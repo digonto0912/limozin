@@ -1,4 +1,5 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002/api';
+// In development, use the backend server URL. In production, use relative paths
+const API_BASE_URL = '/api';
 
 export const api = {
   async fetchRecords() {
