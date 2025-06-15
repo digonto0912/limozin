@@ -1,41 +1,71 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
-// Function to validate Firebase configuration
-const validateFirebaseConfig = (config) => {
-  const requiredFields = ['apiKey', 'authDomain', 'projectId'];
-  const missingFields = requiredFields.filter(field => !config[field]);
-  
-  if (missingFields.length > 0) {
-    throw new Error(`Missing required Firebase configuration fields: ${missingFields.join(', ')}`);
+const getFirebaseConfig = () => {
+  // Log environment status
+  console.log('Environment Status:', {
+    nodeEnv: process.env.NODE_ENV,
+    hasApiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    hasProjectId: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  });
+
+  // In development, we can use environment variables from .env
+  // In production, we must use environment variables from Vercel
+  const config = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || ''
+  };
+
+  // Validate configuration
+  const missingVars = [];
+  if (!config.apiKey) missingVars.push('NEXT_PUBLIC_FIREBASE_API_KEY');
+  if (!config.authDomain) missingVars.push('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN');
+  if (!config.projectId) missingVars.push('NEXT_PUBLIC_FIREBASE_PROJECT_ID');
+
+  if (missingVars.length > 0) {
+    throw new Error(
+      `Missing required environment variables: ${missingVars.join(', ')}. ` +
+      'Make sure these are set in your Vercel project settings.'
+    );
   }
+
+  return config;
 };
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
-};
+let app;
+let db;
 
-// Log Firebase configuration status
-console.log('Firebase Configuration Status:', {
-  hasApiKey: !!firebaseConfig.apiKey,
-  hasAuthDomain: !!firebaseConfig.authDomain,
-  hasProjectId: !!firebaseConfig.projectId,
-  environment: process.env.NODE_ENV
-});
-
-// Validate configuration
-validateFirebaseConfig(firebaseConfig);
-
-// Initialize Firebase only if it hasn't been initialized
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
-
-console.log('Firebase initialized successfully with project:', firebaseConfig.projectId);
+try {
+  const firebaseConfig = getFirebaseConfig();
+  
+  // Initialize Firebase only if it hasn't been initialized
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+    console.log('Firebase initialized successfully with project:', firebaseConfig.projectId);
+  } else {
+    app = getApp();
+    console.log('Using existing Firebase app');
+  }
+  
+  db = getFirestore(app);
+} catch (error) {
+  console.error('Firebase initialization error:', error);
+  if (process.env.NODE_ENV === 'development') {
+    console.error('Current environment variables:', {
+      NEXT_PUBLIC_FIREBASE_API_KEY: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: !!process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    });
+  }
+  // In production, we'll throw the error to prevent the app from running with invalid config
+  if (process.env.NODE_ENV === 'production') {
+    throw error;
+  }
+}
 
 export { db };
 export default app;
