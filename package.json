@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "node backend/scripts/seedData.js",
-    "vercel-build": "next build && cp -r backend ."
+    "vercel-build": "next build"
   },
   "dependencies": {
     "@firebase/app": "^0.13.1",

@@ -26,4 +26,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Export the Express app
-module.exports = app;
+if (typeof exports !== 'undefined') {
+  module.exports = app;
+}
+
+export default app;

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import app from '../../../backend/server.js';
+
+// Import backend server
+const app = require('../../../backend/server');
 
 export async function GET(request, { params }) {
   return handleRequest(request, params);

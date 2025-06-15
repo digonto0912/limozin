@@ -1,19 +1,12 @@
 {
   "version": 2,
-  "builds": [
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/next"
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
+  "regions": ["all"]
 }
