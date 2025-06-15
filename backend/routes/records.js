@@ -1,6 +1,6 @@
-const { fetchRecords, addRecord } = require('../firebase/firestore');
+import { fetchRecords, addRecord } from '../firebase/firestore.js';
 
-const handlers = {
+export const handlers = {
   // GET /api/records - Get all records
   async get(req, res) {
     try {
@@ -24,5 +24,4 @@ const handlers = {
   }
 };
 
-module.exports = handlers;
-exports.default = handlers;
+export default handlers;

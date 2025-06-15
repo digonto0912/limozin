@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const recordsRouter = require('./routes/records');
-const recordRouter = require('./routes/record');
+import express from 'express';
+import cors from 'cors';
+import { handlers as recordsHandlers } from './routes/records.js';
+import { handlers as recordHandler } from './routes/record.js';
 
 const app = express();
 
@@ -10,8 +10,23 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/records', recordsRouter);
-app.use('/api/record', recordRouter);
+app.use('/api/records', (req, res) => {
+  const handler = recordsHandlers[req.method.toLowerCase()];
+  if (handler) {
+    handler(req, res);
+  } else {
+    res.status(405).json({ error: 'Method not allowed' });
+  }
+});
+
+app.use('/api/record/:id?', (req, res) => {
+  const handler = recordHandler[req.method.toLowerCase()];
+  if (handler) {
+    handler(req, res);
+  } else {
+    res.status(405).json({ error: 'Method not allowed' });
+  }
+});
 
 app.get('/', (req, res) => {
   res.json({ message: 'Business Monitoring ERP API is running!' });
@@ -23,11 +38,6 @@ if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
-}
-
-// Export the Express app
-if (typeof exports !== 'undefined') {
-  module.exports = app;
 }
 
 export default app;

@@ -1,5 +1,5 @@
-const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc } = require('firebase/firestore');
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -13,7 +13,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const fetchRecords = async () => {
+export const fetchRecords = async () => {
   const querySnapshot = await getDocs(collection(db, 'records'));
   return querySnapshot.docs.map(doc => ({
     id: doc.id,
@@ -21,23 +21,44 @@ const fetchRecords = async () => {
   }));
 };
 
-const addRecord = async (record) => {
-  return await addDoc(collection(db, 'records'), record);
-};
-
-const updateRecord = async (id, record) => {
+export const fetchRecord = async (id) => {
   const docRef = doc(db, 'records', id);
-  await updateDoc(docRef, record);
+  const docSnap = await getDoc(docRef);
+  
+  if (docSnap.exists()) {
+    return {
+      id: docSnap.id,
+      ...docSnap.data()
+    };
+  }
+  return null;
 };
 
-const deleteRecord = async (id) => {
+export const addRecord = async (data) => {
+  const docRef = await addDoc(collection(db, 'records'), data);
+  return {
+    id: docRef.id,
+    ...data
+  };
+};
+
+export const updateRecord = async (id, data) => {
+  const docRef = doc(db, 'records', id);
+  await updateDoc(docRef, data);
+  return {
+    id,
+    ...data
+  };
+};
+
+export const deleteRecord = async (id) => {
   const docRef = doc(db, 'records', id);
   await deleteDoc(docRef);
 };
 
-module.exports = {
-  db,
+export default {
   fetchRecords,
+  fetchRecord,
   addRecord,
   updateRecord,
   deleteRecord

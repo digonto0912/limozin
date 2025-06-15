@@ -1,6 +1,6 @@
-const { addRecord, updateRecord, deleteRecord } = require('../firebase/firestore');
+import { addRecord, updateRecord, deleteRecord, fetchRecord } from '../firebase/firestore.js';
 
-const handlers = {
+export const handlers = {
   // POST /api/record - Create a new record
   async post(req, res) {
     try {
@@ -58,5 +58,4 @@ const handlers = {
   }
 };
 
-module.exports = handlers;
-exports.default = handlers;
+export default handlers;
