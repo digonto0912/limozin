@@ -4,10 +4,13 @@ const recordsRouter = require('./routes/records');
 const recordRouter = require('./routes/record');
 
 const app = express();
-const PORT = process.env.PORT || 3002;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://limozin.vercel.app', /\.vercel\.app$/]
+    : 'http://localhost:3001'
+}));
 app.use(express.json());
 
 // Routes
@@ -18,6 +21,13 @@ app.get('/', (req, res) => {
   res.json({ message: 'Business Monitoring ERP API is running!' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Only start the server if we're not in a Vercel environment
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3002;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+// Export the app for Vercel
+module.exports = app;

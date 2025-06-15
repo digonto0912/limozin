@@ -24,7 +24,7 @@ It will:
 | Chart Library | Chart.js / Recharts                      |
 | Backend API   | Node.js + Express.js                     |
 | Database      | Firebase Firestore                       |
-| Hosting       | Firebase Hosting or Vercel (for Next.js) |
+| Hosting       | Vercel (for Next.js) |
 
 ---
 

@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "node backend/scripts/seedData.js"
+    "seed": "node backend/scripts/seedData.js",
+    "vercel-build": "next build"
   },
   "dependencies": {
     "@firebase/app": "^0.13.1",
