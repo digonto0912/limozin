@@ -2,7 +2,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 const getFirebaseConfig = () => {
-  // Log environment status
+  // Log environment status 
   console.log('Environment Status:', {
     nodeEnv: process.env.NODE_ENV,
     hasApiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
