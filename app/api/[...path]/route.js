@@ -2,6 +2,36 @@ import { NextResponse } from 'next/server';
 import { handlers as recordsHandlers } from '../../../backend/routes/records.js';
 import { handlers as recordHandler } from '../../../backend/routes/record.js';
 
+// Logger function for API requests
+const logAPIRequest = (method, params, url) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] API Request:`, {
+    method,
+    path: params.path.join('/'),
+    url,
+    envVars: {
+      hasApiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      hasProjectId: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      environment: process.env.NODE_ENV
+    }
+  });
+};
+
+// Logger function for API responses
+const logAPIResponse = (method, path, status, data, error) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] API Response:`, {
+    method,
+    path,
+    status,
+    hasData: !!data,
+    error: error ? {
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    } : undefined
+  });
+};
+
 export async function GET(request, { params }) {
   return handleRequest(request, params, 'GET');
 }
@@ -19,28 +49,18 @@ export async function DELETE(request, { params }) {
 }
 
 async function handleRequest(request, { params }, method) {
-  try {
-    // Log request details for debugging
-    console.log('API Request:', {
-      method,
-      path: params.path,
-      url: request.url,
-      hasEnvVars: {
-        apiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-        projectId: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-      }
-    });
+  // Log incoming request
+  logAPIRequest(method, params, request.url);
 
+  try {
     const pathType = params.path[0]; // 'records' or 'record'
     const handlers = pathType === 'records' ? recordsHandlers : recordHandler;
     const handler = handlers[method.toLowerCase()];
 
     if (!handler) {
-      console.error('No handler found for method:', method);
-      return NextResponse.json(
-        { error: 'Method not allowed' },
-        { status: 405 }
-      );
+      const error = new Error('Method not allowed');
+      logAPIResponse(method, params.path.join('/'), 405, null, error);
+      return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
     // Create Express-like request object
@@ -51,7 +71,7 @@ async function handleRequest(request, { params }, method) {
       body: method !== 'GET' ? await request.json().catch(() => ({})) : undefined
     };
 
-    // Create Express-like response object
+    // Create Express-like response object with logging
     let statusCode = 200;
     let responseData = null;
 
@@ -71,15 +91,14 @@ async function handleRequest(request, { params }, method) {
     // Execute the handler
     await handler(expressReq, expressRes);
 
-    // Log response for debugging
-    console.log('API Response:', {
-      statusCode,
-      hasData: !!responseData
-    });
+    // Log successful response
+    logAPIResponse(method, params.path.join('/'), statusCode, responseData);
 
     return NextResponse.json(responseData, { status: statusCode });
   } catch (error) {
-    console.error('API Error:', error);
+    // Log error response
+    logAPIResponse(method, params.path.join('/'), 500, null, error);
+    
     return NextResponse.json(
       { 
         error: 'Internal Server Error',
