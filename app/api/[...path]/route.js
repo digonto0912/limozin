@@ -1,56 +1,6 @@
 import { NextResponse } from 'next/server';
-import express from 'express';
-import cors from 'cors';
-
-// Initialize express app
-const app = express();
-
-// Import route handlers
-const recordsRoutes = (req, res) => {
-  const { method } = req;
-  
-  switch (method) {
-    case 'GET':
-      // Handle GET /api/records
-      return import('../../../backend/routes/records.js')
-        .then(module => module.default.get(req, res));
-    case 'POST':
-      // Handle POST /api/records
-      return import('../../../backend/routes/records.js')
-        .then(module => module.default.post(req, res));
-    default:
-      res.status(405).json({ error: 'Method not allowed' });
-  }
-};
-
-const recordRoute = (req, res) => {
-  const { method } = req;
-  
-  switch (method) {
-    case 'GET':
-      // Handle GET /api/record/:id
-      return import('../../../backend/routes/record.js')
-        .then(module => module.default.get(req, res));
-    case 'PUT':
-      // Handle PUT /api/record/:id
-      return import('../../../backend/routes/record.js')
-        .then(module => module.default.put(req, res));
-    case 'DELETE':
-      // Handle DELETE /api/record/:id
-      return import('../../../backend/routes/record.js')
-        .then(module => module.default.delete(req, res));
-    default:
-      res.status(405).json({ error: 'Method not allowed' });
-  }
-};
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Setup routes
-app.use('/api/records', recordsRoutes);
-app.use('/api/record', recordRoute);
+import { handlers as recordsHandlers } from '../../../backend/routes/records.js';
+import { handlers as recordHandler } from '../../../backend/routes/record.js';
 
 export async function GET(request, { params }) {
   return handleRequest(request, params, 'GET');
@@ -70,49 +20,72 @@ export async function DELETE(request, { params }) {
 
 async function handleRequest(request, { params }, method) {
   try {
-    const url = '/api/' + params.path.join('/');
-    const headers = Object.fromEntries(request.headers);
-    const body = method === 'GET' ? undefined : await request.json().catch(() => undefined);
-
-    return new Promise((resolve) => {
-      const expressReq = {
-        method,
-        url,
-        headers,
-        body,
-        params: {},
-        query: Object.fromEntries(new URL(request.url).searchParams),
-      };
-
-      const expressRes = {
-        setHeader: () => {},
-        status: function(code) {
-          this.statusCode = code;
-          return this;
-        },
-        json: function(data) {
-          resolve(NextResponse.json(data, { status: this.statusCode || 200 }));
-        },
-        send: function(data) {
-          resolve(new NextResponse(data, { status: this.statusCode || 200 }));
-        }
-      };
-
-      // Parse the URL to get the path parameters
-      const pathParts = params.path;
-      if (pathParts[0] === 'records') {
-        recordsRoutes(expressReq, expressRes);
-      } else if (pathParts[0] === 'record') {
-        expressReq.params.id = pathParts[1];
-        recordRoute(expressReq, expressRes);
-      } else {
-        resolve(NextResponse.json({ error: 'Not found' }, { status: 404 }));
+    // Log request details for debugging
+    console.log('API Request:', {
+      method,
+      path: params.path,
+      url: request.url,
+      hasEnvVars: {
+        apiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+        projectId: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
       }
     });
+
+    const pathType = params.path[0]; // 'records' or 'record'
+    const handlers = pathType === 'records' ? recordsHandlers : recordHandler;
+    const handler = handlers[method.toLowerCase()];
+
+    if (!handler) {
+      console.error('No handler found for method:', method);
+      return NextResponse.json(
+        { error: 'Method not allowed' },
+        { status: 405 }
+      );
+    }
+
+    // Create Express-like request object
+    const expressReq = {
+      method,
+      params: pathType === 'record' ? { id: params.path[1] } : {},
+      query: Object.fromEntries(new URL(request.url).searchParams),
+      body: method !== 'GET' ? await request.json().catch(() => ({})) : undefined
+    };
+
+    // Create Express-like response object
+    let statusCode = 200;
+    let responseData = null;
+
+    const expressRes = {
+      status: (code) => {
+        statusCode = code;
+        return expressRes;
+      },
+      json: (data) => {
+        responseData = data;
+      },
+      send: (data) => {
+        responseData = data;
+      }
+    };
+
+    // Execute the handler
+    await handler(expressReq, expressRes);
+
+    // Log response for debugging
+    console.log('API Response:', {
+      statusCode,
+      hasData: !!responseData
+    });
+
+    return NextResponse.json(responseData, { status: statusCode });
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { 
+        error: 'Internal Server Error',
+        message: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
