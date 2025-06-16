@@ -196,10 +196,16 @@ backend-end: http://localhost:3002/api
 
 ## 🛠️ 12. Future Enhancements
 
-* Admin login (Firebase Auth)
-* Export to Excel/CSV
-* Reminders (email/SMS)
-* Mobile version (React Native)
+* **Authentication System**: Complete login/signup functionality with user roles (Admin, Staff)
+* **History Tracker**: Audit log system to track which user made which changes in the database (who added/edited/deleted records and when)
+* **Data Backup & Recovery**: Automated backup system and data recovery options
+* **Advanced Analytics**: More detailed reporting with filters and date ranges
+* **Export to Excel/CSV**: Download data in various formats
+* **Notification System**: Email/SMS reminders for expiring documents and due payments
+* **Mobile Application**: React Native app for mobile access
+* **Multi-language Support**: Support for local languages
+* **Role-based Permissions**: Different access levels for different user types
+* **Document Upload**: Ability to attach scanned documents/photos to records
 
 ---
 
