@@ -1,7 +1,11 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import { handlers as recordsHandlers } from './routes/records.js';
 import { handlers as recordHandler } from './routes/record.js';
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
 
 const app = express();
 
@@ -19,7 +23,18 @@ app.use('/api/records', (req, res) => {
   }
 });
 
-app.use('/api/record/:id?', (req, res) => {
+// Handle /api/record/:id for GET, PUT, DELETE (this must come first to catch specific IDs)
+app.use('/api/record/:id', (req, res) => {
+  const handler = recordHandler[req.method.toLowerCase()];
+  if (handler) {
+    handler(req, res);
+  } else {
+    res.status(405).json({ error: 'Method not allowed' });
+  }
+});
+
+// Handle /api/record for POST (create new record without ID)
+app.use('/api/record', (req, res) => {
   const handler = recordHandler[req.method.toLowerCase()];
   if (handler) {
     handler(req, res);

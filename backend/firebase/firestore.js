@@ -1,5 +1,9 @@
+import dotenv from 'dotenv';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
+
+// Load environment variables first
+dotenv.config({ path: '.env.local' });
 
 // Logger function
 const log = (action, details) => {
