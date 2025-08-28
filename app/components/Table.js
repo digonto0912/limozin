@@ -4,9 +4,11 @@ import {
   MagnifyingGlassIcon,
   ChevronUpDownIcon,
   PencilSquareIcon,
+  ClockIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import moment from "moment";
+import PaymentHistoryModal from "./PaymentHistoryModal";
 
 const ColorInfo = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -23,12 +25,16 @@ const ColorInfo = ({ isOpen, onClose }) => {
           <div className="color-info-item row-expired-id">
             <span className="color-box"></span>
             <span>কমলা: আইডি কার্ডের মেয়াদ শেষ</span>
-          </div>          <div className="color-info-item row-expired-passport">
+          </div>{" "}
+          <div className="color-info-item row-expired-passport">
             <span className="color-box"></span>
             <span>হলুদ: পাসপোর্টের মেয়াদ শেষ</span>
           </div>
         </div>
-        <button className="btn btn-primary btn-text-durty-center" onClick={onClose}>
+        <button
+          className="btn btn-primary btn-text-durty-center"
+          onClick={onClose}
+        >
           Close
         </button>
       </div>
@@ -42,20 +48,38 @@ export default function Table({
   onDelete,
   showColorInfo = false,
   onColorInfoClose,
-  highlightEnabled = true
+  highlightEnabled = true,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
+  const [paymentHistoryModal, setPaymentHistoryModal] = useState({
+    isOpen: false,
+    person: null,
+  });
+
+  const showHisLifeTimeTransactionHistory = (record) => {
+    setPaymentHistoryModal({
+      isOpen: true,
+      person: record,
+    });
+  };
+
+  const closePaymentHistoryModal = () => {
+    setPaymentHistoryModal({
+      isOpen: false,
+      person: null,
+    });
+  };
 
   const columns = [
-    { field: 'name', label: 'Name', sortable: true },
-    { field: 'passportExpiry', label: 'Passport Expiry', sortable: true },
-    { field: 'idNumber', label: 'ID Number', sortable: true },
-    { field: 'idExpiry', label: 'ID Expiry', sortable: true },
-    { field: 'joinDate', label: 'Join Date', sortable: true },
-    { field: 'phone', label: 'Phone', sortable: true },
-    { field: 'dueBalance', label: 'Due Balance', sortable: true }
+    { field: "name", label: "Name", sortable: true },
+    { field: "passportExpiry", label: "Passport Expiry", sortable: true },
+    { field: "idNumber", label: "ID Number", sortable: true },
+    { field: "idExpiry", label: "ID Expiry", sortable: true },
+    { field: "joinDate", label: "Join Date", sortable: true },
+    { field: "phone", label: "Phone", sortable: true },
+    { field: "dueBalance", label: "Due Balance", sortable: true },
   ];
 
   const formatDate = (timestamp) => {
@@ -90,22 +114,22 @@ export default function Table({
       let bValue = b[sortField];
 
       // Handle date fields
-      if (['passportExpiry', 'idExpiry', 'joinDate'].includes(sortField)) {
+      if (["passportExpiry", "idExpiry", "joinDate"].includes(sortField)) {
         aValue = aValue ? new Date(aValue).getTime() : 0;
         bValue = bValue ? new Date(bValue).getTime() : 0;
       }
       // Handle numeric fields
-      else if (sortField === 'dueBalance') {
+      else if (sortField === "dueBalance") {
         aValue = Number(aValue) || 0;
         bValue = Number(bValue) || 0;
       }
       // Handle string fields
       else {
-        aValue = (aValue || '').toString().toLowerCase();
-        bValue = (bValue || '').toString().toLowerCase();
+        aValue = (aValue || "").toString().toLowerCase();
+        bValue = (bValue || "").toString().toLowerCase();
       }
 
-      if (sortDirection === 'asc') {
+      if (sortDirection === "asc") {
         return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
       } else {
         return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
@@ -114,26 +138,28 @@ export default function Table({
   };
 
   const getHighlightClass = (record) => {
-    if (!highlightEnabled) return '';
-    
+    if (!highlightEnabled) return "";
+
     const now = new Date();
     const hasDue = record.dueBalance > 0;
     const hasExpiredId = record.idExpiry && new Date(record.idExpiry) < now;
-    const hasExpiredPassport = record.passportExpiry && new Date(record.passportExpiry) < now;
+    const hasExpiredPassport =
+      record.passportExpiry && new Date(record.passportExpiry) < now;
 
-    if (hasDue && hasExpiredId && hasExpiredPassport) return 'row-all-conditions';
-    if (hasDue && hasExpiredId) return 'row-due-and-id';
-    if (hasDue && hasExpiredPassport) return 'row-due-and-passport';
-    if (hasExpiredId && hasExpiredPassport) return 'row-id-and-passport';
-    if (hasDue) return 'row-has-due';
-    if (hasExpiredId) return 'row-expired-id';
-    if (hasExpiredPassport) return 'row-expired-passport';
-    
-    return '';
+    if (hasDue && hasExpiredId && hasExpiredPassport)
+      return "row-all-conditions";
+    if (hasDue && hasExpiredId) return "row-due-and-id";
+    if (hasDue && hasExpiredPassport) return "row-due-and-passport";
+    if (hasExpiredId && hasExpiredPassport) return "row-id-and-passport";
+    if (hasDue) return "row-has-due";
+    if (hasExpiredId) return "row-expired-id";
+    if (hasExpiredPassport) return "row-expired-passport";
+
+    return "";
   };
 
   // Filter records
-  const filteredRecords = getSortedRecords().filter(record => {
+  const filteredRecords = getSortedRecords().filter((record) => {
     const searchLower = searchTerm.toLowerCase();
     return (
       record.name?.toLowerCase().includes(searchLower) ||
@@ -154,6 +180,13 @@ export default function Table({
 
   const ActionButtons = ({ record }) => (
     <div className="action-buttons">
+      <button
+        onClick={() => showHisLifeTimeTransactionHistory(record)}
+        className="history-button"
+        title="View lifetime transaction history of this person"
+      >
+        <ClockIcon className="h-4 w-4" />
+      </button>
       <button
         onClick={() => onEdit(record)}
         className="edit-button"
@@ -188,7 +221,7 @@ export default function Table({
       </div>
 
       {/* Table View (Tablet and up) */}
-      <div style={{ overflowX: 'auto', width: '100%' }}>
+      <div style={{ overflowX: "auto", width: "100%" }}>
         <table className="records-table">
           <thead>
             <tr>
@@ -196,14 +229,22 @@ export default function Table({
                 <th
                   key={column.field}
                   onClick={() => column.sortable && handleSort(column.field)}
-                  className={`${column.sortable ? 'sortable' : ''} ${sortField === column.field ? 'sorted' : ''}`}
+                  className={`${column.sortable ? "sortable" : ""} ${
+                    sortField === column.field ? "sorted" : ""
+                  }`}
                 >
                   {column.label}
                   {column.sortable && (
-                    <ChevronUpDownIcon 
-                      className={`sort-icon ${sortField === column.field ? 'active' : ''}`}
+                    <ChevronUpDownIcon
+                      className={`sort-icon ${
+                        sortField === column.field ? "active" : ""
+                      }`}
                       style={{
-                        transform: `translateY(-50%) ${sortField === column.field && sortDirection === 'desc' ? 'rotate(180deg)' : ''}`
+                        transform: `translateY(-50%) ${
+                          sortField === column.field && sortDirection === "desc"
+                            ? "rotate(180deg)"
+                            : ""
+                        }`,
                       }}
                     />
                   )}
@@ -215,7 +256,14 @@ export default function Table({
           <tbody>
             {filteredRecords.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + 1} style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+                <td
+                  colSpan={columns.length + 1}
+                  style={{
+                    textAlign: "center",
+                    padding: "2rem",
+                    color: "#6b7280",
+                  }}
+                >
                   No records found
                 </td>
               </tr>
@@ -224,21 +272,41 @@ export default function Table({
                 <tr key={record.id} className={getHighlightClass(record)}>
                   <td>{record.name}</td>
                   <td>
-                    <span className={record.passportExpiry && new Date(record.passportExpiry) < new Date() ? 'text-amber-600 font-medium' : ''}>
+                    <span
+                      className={
+                        record.passportExpiry &&
+                        new Date(record.passportExpiry) < new Date()
+                          ? "text-amber-600 font-medium"
+                          : ""
+                      }
+                    >
                       {formatDate(record.passportExpiry)}
                     </span>
                   </td>
                   <td>{record.idNumber}</td>
                   <td>
-                    <span className={record.idExpiry && new Date(record.idExpiry) < new Date() ? 'text-orange-600 font-medium' : ''}>
+                    <span
+                      className={
+                        record.idExpiry &&
+                        new Date(record.idExpiry) < new Date()
+                          ? "text-orange-600 font-medium"
+                          : ""
+                      }
+                    >
                       {formatDate(record.idExpiry)}
                     </span>
                   </td>
                   <td>{formatDate(record.joinDate)}</td>
                   <td>{record.phone}</td>
                   <td>
-                    <span className={record.dueBalance > 0 ? 'text-red-600 font-medium' : ''}>
-                      {record.dueBalance ? ' ﷼ ' + record.dueBalance.toLocaleString() : ' ﷼ 0'}
+                    <span
+                      className={
+                        record.dueBalance > 0 ? "text-red-600 font-medium" : ""
+                      }
+                    >
+                      {record.dueBalance
+                        ? " ﷼ " + record.dueBalance.toLocaleString()
+                        : " ﷼ 0"}
                     </span>
                   </td>
                   <td className="action-cell">
@@ -254,21 +322,30 @@ export default function Table({
       {/* Mobile Card View */}
       <div className="mobile-cards">
         {filteredRecords.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+          <div
+            style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}
+          >
             No records found
           </div>
         ) : (
           filteredRecords.map((record) => (
-            <div key={record.id} className={`record-card ${getHighlightClass(record)}`}>
+            <div
+              key={record.id}
+              className={`record-card ${getHighlightClass(record)}`}
+            >
               {columns.map((column) => (
                 <div key={column.field} className="card-field">
                   <span className="field-label">{column.label}:</span>
                   <span className="field-value">
-                    {column.field === 'dueBalance'
-                      ? (record.dueBalance ? ' ﷼ ' + record.dueBalance.toLocaleString() : ' ﷼ 0')
-                      : ['passportExpiry', 'idExpiry', 'joinDate'].includes(column.field)
-                        ? formatDate(record[column.field])
-                        : record[column.field]}
+                    {column.field === "dueBalance"
+                      ? record.dueBalance
+                        ? " ﷼ " + record.dueBalance.toLocaleString()
+                        : " ﷼ 0"
+                      : ["passportExpiry", "idExpiry", "joinDate"].includes(
+                          column.field
+                        )
+                      ? formatDate(record[column.field])
+                      : record[column.field]}
                   </span>
                 </div>
               ))}
@@ -281,6 +358,12 @@ export default function Table({
       </div>
 
       <ColorInfo isOpen={showColorInfo} onClose={onColorInfoClose} />
+      
+      <PaymentHistoryModal
+        person={paymentHistoryModal.person}
+        isOpen={paymentHistoryModal.isOpen}
+        onClose={closePaymentHistoryModal}
+      />
     </div>
   );
 }

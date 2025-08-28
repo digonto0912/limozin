@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc, query, where } from 'firebase/firestore';
 
 // Load environment variables first
 dotenv.config({ path: '.env.local' });
@@ -135,10 +135,57 @@ export const deleteRecord = async (id) => {
   }
 };
 
+// Get payment history for a specific person
+export const getPaymentHistory = async (personId) => {
+  try {
+    log('getPaymentHistory', { personId });
+    const q = query(
+      collection(db, 'paymentHistory'), 
+      where('personId', '==', personId)
+    );
+    const querySnapshot = await getDocs(q);
+    const paymentHistory = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })).sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    log('getPaymentHistory', { count: paymentHistory.length, personId });
+    return paymentHistory;
+  } catch (error) {
+    logError('getPaymentHistory', error);
+    throw error;
+  }
+};
+
+// Add a payment record
+export const addPaymentRecord = async (paymentData) => {
+  try {
+    log('addPaymentRecord', { paymentData });
+    const paymentWithTimestamp = {
+      ...paymentData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    const docRef = await addDoc(collection(db, 'paymentHistory'), paymentWithTimestamp);
+    const newPaymentRecord = {
+      id: docRef.id,
+      ...paymentWithTimestamp
+    };
+    log('addPaymentRecord', { success: true, id: docRef.id });
+    return newPaymentRecord;
+  } catch (error) {
+    logError('addPaymentRecord', error);
+    throw error;
+  }
+};
+
 export default {
   fetchRecords,
   fetchRecord,
   addRecord,
   updateRecord,
-  deleteRecord
+  deleteRecord,
+  getPaymentHistory,
+  addPaymentRecord
 };

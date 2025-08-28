@@ -10,7 +10,7 @@
 :root {
   /* Layout */
   --header-height: 4rem;
-  --container-width: 1200px;
+  --container-width: 1400px;
   --sidebar-width: 240px;
 
   /* Spacing */
@@ -400,7 +400,8 @@ html {
 
 /* Updated gradient order with high visibility */
 .records-table tr.row-due-and-id {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     rgba(249, 115, 22, 0.4) 0%,
     rgba(249, 115, 22, 0.4) 50%,
     rgba(239, 68, 68, 0.4) 50%,
@@ -409,7 +410,8 @@ html {
 }
 
 .records-table tr.row-due-and-passport {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     rgba(234, 179, 8, 0.4) 0%,
     rgba(234, 179, 8, 0.4) 50%,
     rgba(239, 68, 68, 0.4) 50%,
@@ -418,7 +420,8 @@ html {
 }
 
 .records-table tr.row-id-and-passport {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     rgba(234, 179, 8, 0.4) 0%,
     rgba(234, 179, 8, 0.4) 50%,
     rgba(249, 115, 22, 0.4) 50%,
@@ -427,7 +430,8 @@ html {
 }
 
 .records-table tr.row-all-conditions {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     rgba(234, 179, 8, 0.4) 0%,
     rgba(234, 179, 8, 0.4) 33%,
     rgba(249, 115, 22, 0.4) 33%,
@@ -455,7 +459,8 @@ html {
 }
 
 .records-table tr.row-due-and-id:hover {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     rgba(249, 115, 22, 0.5) 0%,
     rgba(249, 115, 22, 0.5) 50%,
     rgba(239, 68, 68, 0.5) 50%,
@@ -464,7 +469,8 @@ html {
 }
 
 .records-table tr.row-due-and-passport:hover {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     rgba(234, 179, 8, 0.5) 0%,
     rgba(234, 179, 8, 0.5) 50%,
     rgba(239, 68, 68, 0.5) 50%,
@@ -473,7 +479,8 @@ html {
 }
 
 .records-table tr.row-id-and-passport:hover {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     rgba(234, 179, 8, 0.5) 0%,
     rgba(234, 179, 8, 0.5) 50%,
     rgba(249, 115, 22, 0.5) 50%,
@@ -482,7 +489,8 @@ html {
 }
 
 .records-table tr.row-all-conditions:hover {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     rgba(234, 179, 8, 0.5) 0%,
     rgba(234, 179, 8, 0.5) 33%,
     rgba(249, 115, 22, 0.5) 33%,
@@ -512,7 +520,9 @@ html {
 }
 
 /* Slightly larger buttons for taller rows */
-.edit-button, .delete-button {
+.history-button,
+.edit-button,
+.delete-button {
   width: 36px;
   height: 36px;
   padding: 0.5rem;
@@ -531,7 +541,9 @@ html {
   align-items: center;
 }
 
-.edit-button, .delete-button {
+.history-button,
+.edit-button,
+.delete-button {
   width: 32px;
   height: 32px;
   padding: 0.4rem;
@@ -545,6 +557,10 @@ html {
   background: white;
 }
 
+.history-button {
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
 .edit-button {
   color: var(--primary-color);
   border-color: var(--primary-color);
@@ -553,6 +569,13 @@ html {
 .delete-button {
   color: var(--danger-color);
   border-color: var(--danger-color);
+}
+
+.history-button:hover {
+  background-color: var(--secondary-color);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(67, 97, 238, 0.2);
 }
 
 .edit-button:hover {
@@ -569,12 +592,16 @@ html {
   box-shadow: 0 2px 4px rgba(230, 57, 70, 0.2);
 }
 
-.edit-button:active, .delete-button:active {
+.history-button,
+.edit-button:active,
+.delete-button:active {
   transform: translateY(0);
   box-shadow: none;
 }
 
-.edit-button svg, .delete-button svg {
+.history-button svg,
+.edit-button svg,
+.delete-button svg {
   width: 16px;
   height: 16px;
   stroke-width: 2;
@@ -776,7 +803,8 @@ html {
   max-width: 520px;
   position: relative;
   margin: 2rem auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }
 
@@ -1237,7 +1265,9 @@ html {
     gap: 0.35rem;
   }
 
-  .edit-button, .delete-button {
+  .history-button,
+  .edit-button,
+  .delete-button {
     width: 32px;
     height: 32px;
     padding: 0.4rem;
@@ -1268,7 +1298,9 @@ html {
     font-size: 0.875rem;
   }
 
-  .edit-button, .delete-button {
+  .history-button,
+  .edit-button,
+  .delete-button {
     width: 36px;
     height: 36px;
     padding: 0.5rem;
@@ -1318,7 +1350,7 @@ html {
 
 /* Mobile Card Layout */
 @media (max-width: 767px) {
-  .records-table, 
+  .records-table,
   .records-table thead {
     display: none; /* Hide table on mobile */
   }
@@ -1351,7 +1383,8 @@ html {
   }
 
   .record-card.row-due-and-id {
-    background: linear-gradient(135deg,
+    background: linear-gradient(
+      135deg,
       rgba(249, 115, 22, 0.4) 0%,
       rgba(249, 115, 22, 0.4) 50%,
       rgba(239, 68, 68, 0.4) 50%,
@@ -1360,7 +1393,8 @@ html {
   }
 
   .record-card.row-due-and-passport {
-    background: linear-gradient(135deg,
+    background: linear-gradient(
+      135deg,
       rgba(234, 179, 8, 0.4) 0%,
       rgba(234, 179, 8, 0.4) 50%,
       rgba(239, 68, 68, 0.4) 50%,
@@ -1369,7 +1403,8 @@ html {
   }
 
   .record-card.row-id-and-passport {
-    background: linear-gradient(135deg,
+    background: linear-gradient(
+      135deg,
       rgba(234, 179, 8, 0.4) 0%,
       rgba(234, 179, 8, 0.4) 50%,
       rgba(249, 115, 22, 0.4) 50%,
@@ -1378,7 +1413,8 @@ html {
   }
 
   .record-card.row-all-conditions {
-    background: linear-gradient(135deg,
+    background: linear-gradient(
+      135deg,
       rgba(234, 179, 8, 0.4) 0%,
       rgba(234, 179, 8, 0.4) 33%,
       rgba(249, 115, 22, 0.4) 33%,
@@ -1502,7 +1538,8 @@ html {
 .modal-content {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
@@ -1819,5 +1856,176 @@ html {
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     width: 100%;
+  }
+}
+
+/* Payment History Modal Styles */
+.payment-history-modal {
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.payment-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.summary-card {
+  text-align: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.summary-card h4 {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.summary-card .amount {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.amount.positive {
+  color: var(--danger-color);
+}
+
+.amount.negative {
+  color: var(--success-color);
+}
+
+.add-payment-form {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+}
+
+.add-payment-form h4 {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.payment-history-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.payment-history-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.payment-history-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.payment-history-table th,
+.payment-history-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.payment-history-table th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.transaction-type {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.transaction-type.payment {
+  background: rgba(76, 201, 190, 0.1);
+  color: var(--success-color);
+}
+
+.transaction-type.charge {
+  background: rgba(230, 57, 70, 0.1);
+  color: var(--danger-color);
+}
+
+.loading-container,
+.error-container,
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Mobile responsiveness for payment history */
+@media (max-width: 768px) {
+  .payment-history-modal {
+    max-width: 95vw;
+    margin: 1rem;
+  }
+  
+  .payment-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-history-table {
+    font-size: 0.75rem;
+  }
+  
+  .payment-history-table th,
+  .payment-history-table td {
+    padding: 0.5rem 0.25rem;
   }
 }

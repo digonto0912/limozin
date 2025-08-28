@@ -103,3 +103,38 @@ export const deleteRecord = async (id) => {
     throw error;
   }
 };
+
+// Get payment history for a specific person
+export const getPaymentHistory = async (personId) => {
+  try {
+    const q = query(
+      collection(db, 'paymentHistory'), 
+      where('personId', '==', personId)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...convertTimestamps(doc.data())
+    })).sort((a, b) => new Date(b.date) - new Date(a.date));
+  } catch (error) {
+    console.error('Error fetching payment history:', error);
+    throw error;
+  }
+};
+
+// Add a payment record
+export const addPaymentRecord = async (paymentData) => {
+  try {
+    const paymentWithTimestamp = {
+      ...paymentData,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+    
+    const docRef = await addDoc(collection(db, 'paymentHistory'), paymentWithTimestamp);
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding payment record:', error);
+    throw error;
+  }
+};
