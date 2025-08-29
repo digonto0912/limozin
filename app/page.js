@@ -103,6 +103,11 @@ export default function Home() {
 
   const handleSaveRecord = async (formData) => {
     try {
+      // Get the original record to compare due balance changes
+      const originalRecord = formData.id ? records.find(r => r.id === formData.id) : null;
+      const originalDueBalance = originalRecord ? (originalRecord.dueBalance || 0) : 0;
+      const newDueBalance = formData.dueBalance || 0;
+      
       const url = formData.id ? `/api/record/${formData.id}` : '/api/record';
       const method = formData.id ? 'PUT' : 'POST';
       
@@ -114,6 +119,59 @@ export default function Home() {
 
       if (!response.ok) {
         throw new Error('Failed to save record');
+      }
+
+      // Get the saved record data to get the ID for new records
+      const savedRecord = await response.json();
+      const recordId = formData.id || savedRecord.id;
+
+      // Create payment history entry for both new and edited records with due balance
+      if (newDueBalance > 0) {
+        if (formData.id) {
+          // Editing existing record - only if balance changed
+          if (originalDueBalance !== newDueBalance) {
+            const balanceChange = newDueBalance - originalDueBalance;
+            
+            try {
+              await fetch('/api/payment-history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  personId: recordId,
+                  personName: formData.name,
+                  amount: Math.abs(balanceChange),
+                  type: balanceChange > 0 ? 'charge' : 'payment',
+                  description: balanceChange > 0 
+                    ? `Due balance increased from ﷼${originalDueBalance.toLocaleString()} to ﷼${newDueBalance.toLocaleString()}` 
+                    : `Due balance decreased from ﷼${originalDueBalance.toLocaleString()} to ﷼${newDueBalance.toLocaleString()}`,
+                  date: new Date().toISOString(),
+                }),
+              });
+              console.log('Payment history updated automatically for edit');
+            } catch (historyError) {
+              console.error('Failed to update payment history:', historyError);
+            }
+          }
+        } else {
+          // Adding new record with due balance - create initial charge entry
+          try {
+            await fetch('/api/payment-history', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                personId: recordId,
+                personName: formData.name,
+                amount: newDueBalance,
+                type: 'charge',
+                description: `Initial due balance of ﷼${newDueBalance.toLocaleString()} set when record was created`,
+                date: new Date().toISOString(),
+              }),
+            });
+            console.log('Payment history created automatically for new record');
+          } catch (historyError) {
+            console.error('Failed to create initial payment history:', historyError);
+          }
+        }
       }
 
       showNotification(

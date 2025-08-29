@@ -129,6 +129,17 @@ export default function AddEditModal({ record = null, onClose, onSave }) {
                 className={errors.dueBalance ? 'error' : ''}
               />
               {errors.dueBalance && <span className="error-message">{errors.dueBalance}</span>}
+              <div style={{ 
+                fontSize: '0.75rem', 
+                color: '#6b7280', 
+                marginTop: '4px',
+                fontStyle: 'italic' 
+              }}>
+                💡 {record 
+                  ? 'Changes in due balance automatically update payment history'
+                  : 'Setting due balance will create initial payment history entry'
+                }
+              </div>
             </div>
           </div>
 

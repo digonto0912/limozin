@@ -1,19 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import moment from 'moment';
 
 export default function PaymentHistoryModal({ person, isOpen, onClose }) {
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showAddPayment, setShowAddPayment] = useState(false);
-  const [newPayment, setNewPayment] = useState({
-    amount: '',
-    type: 'payment', // 'payment' or 'charge'
-    description: '',
-    date: new Date().toISOString().split('T')[0]
-  });
+  const [expandedDetails, setExpandedDetails] = useState({});
 
   useEffect(() => {
     if (isOpen && person) {
@@ -57,65 +51,37 @@ export default function PaymentHistoryModal({ person, isOpen, onClose }) {
     }
   };
 
-  const handleAddPayment = async () => {
-    if (!newPayment.amount || isNaN(Number(newPayment.amount))) {
-      alert('Please enter a valid amount');
-      return;
-    }
-
-    try {
-      const paymentData = {
-        personId: person.id,
-        personName: person.name,
-        amount: Number(newPayment.amount),
-        type: newPayment.type,
-        description: newPayment.description,
-        date: new Date(newPayment.date).toISOString(),
-      };
-
-      const response = await fetch('/api/payment-history', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(paymentData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to add payment record');
-      }
-
-      // Reset form
-      setNewPayment({
-        amount: '',
-        type: 'payment',
-        description: '',
-        date: new Date().toISOString().split('T')[0]
-      });
-      setShowAddPayment(false);
-      
-      // Refresh payment history
-      await fetchPaymentHistory();
-    } catch (error) {
-      console.error('Error adding payment:', error);
-      alert('Failed to add payment record');
-    }
-  };
-
   const formatCurrency = (amount) => {
     return ` ﷼ ${Math.abs(amount).toLocaleString()}`;
   };
 
+  const formatDateWithTime = (dateString) => {
+    return moment(dateString).format('MMM D, YYYY h:mm A');
+  };
+
+  const toggleDetails = (transactionId) => {
+    setExpandedDetails(prev => ({
+      ...prev,
+      [transactionId]: !prev[transactionId]
+    }));
+  };
+
   const calculateRunningBalance = () => {
+    // Sort transactions by date (oldest first) to calculate running balance correctly
+    const sortedTransactions = [...paymentHistory].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
     let balance = 0;
-    return paymentHistory.map(transaction => {
+    const transactionsWithBalance = sortedTransactions.map(transaction => {
       if (transaction.type === 'payment') {
         balance -= transaction.amount;
       } else {
         balance += transaction.amount;
       }
       return { ...transaction, runningBalance: balance };
-    }).reverse(); // Show newest first
+    });
+    
+    // Return sorted by newest first for display
+    return transactionsWithBalance.reverse();
   };
 
   const transactionsWithBalance = calculateRunningBalance();
@@ -154,67 +120,20 @@ export default function PaymentHistoryModal({ person, isOpen, onClose }) {
           </div>
         </div>
 
-        <div className="modal-actions">
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={() => setShowAddPayment(!showAddPayment)}
-          >
-            <PlusIcon className="h-4 w-4" />
-            Add Transaction
-          </button>
+        <div className="payment-info-note">
+          <p style={{ 
+            padding: '0.75rem', 
+            backgroundColor: '#f0f9ff', 
+            border: '1px solid #0ea5e9', 
+            borderRadius: '6px', 
+            margin: '1rem',
+            fontSize: '0.875rem',
+            color: '#0369a1'
+          }}>
+            📝 <strong>Note:</strong> Payment history is automatically updated when you edit the due balance in the Edit Record modal. 
+            Increase in due balance = charge, decrease = payment received.
+          </p>
         </div>
-
-        {showAddPayment && (
-          <div className="add-payment-form">
-            <h4>Add New Transaction</h4>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Type</label>
-                <select
-                  value={newPayment.type}
-                  onChange={(e) => setNewPayment({ ...newPayment, type: e.target.value })}
-                >
-                  <option value="payment">Payment (Credit)</option>
-                  <option value="charge">Charge (Debit)</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Amount</label>
-                <input
-                  type="number"
-                  value={newPayment.amount}
-                  onChange={(e) => setNewPayment({ ...newPayment, amount: e.target.value })}
-                  placeholder="0.00"
-                />
-              </div>
-              <div className="form-group">
-                <label>Date</label>
-                <input
-                  type="date"
-                  value={newPayment.date}
-                  onChange={(e) => setNewPayment({ ...newPayment, date: e.target.value })}
-                />
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Description</label>
-              <input
-                type="text"
-                value={newPayment.description}
-                onChange={(e) => setNewPayment({ ...newPayment, description: e.target.value })}
-                placeholder="Optional description"
-              />
-            </div>
-            <div className="form-actions">
-              <button className="btn btn-secondary" onClick={() => setShowAddPayment(false)}>
-                Cancel
-              </button>
-              <button className="btn btn-primary" onClick={handleAddPayment}>
-                Add Transaction
-              </button>
-            </div>
-          </div>
-        )}
 
         <div className="payment-history-content">
           {isLoading ? (
@@ -232,7 +151,7 @@ export default function PaymentHistoryModal({ person, isOpen, onClose }) {
           ) : transactionsWithBalance.length === 0 ? (
             <div className="empty-state">
               <p>No payment history found for this person.</p>
-              <p className="text-sm text-gray-500">Add the first transaction using the button above.</p>
+              <p className="text-sm text-gray-500">Payment history will be automatically created when you edit the due balance.</p>
             </div>
           ) : (
             <div className="payment-history-table">
@@ -249,7 +168,9 @@ export default function PaymentHistoryModal({ person, isOpen, onClose }) {
                 <tbody>
                   {transactionsWithBalance.map((transaction) => (
                     <tr key={transaction.id}>
-                      <td>{moment(transaction.date).format('MMM D, YYYY')}</td>
+                      <td style={{ fontSize: '0.875rem' }}>
+                        <div>{formatDateWithTime(transaction.date)}</div>
+                      </td>
                       <td>
                         <span className={`transaction-type ${transaction.type}`}>
                           {transaction.type === 'payment' ? 'Payment' : 'Charge'}
@@ -258,7 +179,30 @@ export default function PaymentHistoryModal({ person, isOpen, onClose }) {
                       <td className={`amount ${transaction.type === 'payment' ? 'negative' : 'positive'}`}>
                         {transaction.type === 'payment' ? '-' : '+'}{formatCurrency(transaction.amount)}
                       </td>
-                      <td>{transaction.description || '-'}</td>
+                      <td style={{ maxWidth: '300px' }}>
+                        <div>
+                          {expandedDetails[transaction.id] && (
+                            <div style={{ marginBottom: '4px', fontSize: '0.875rem' }}>
+                              {transaction.description || '-'}
+                            </div>
+                          )}
+                          <button
+                            onClick={() => toggleDetails(transaction.id)}
+                            style={{
+                              background: 'none',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '4px',
+                              padding: '2px 8px',
+                              color: '#374151',
+                              cursor: 'pointer',
+                              fontSize: '0.75rem',
+                              backgroundColor: '#f9fafb'
+                            }}
+                          >
+                            {expandedDetails[transaction.id] ? 'Hide Details' : 'Show Details'}
+                          </button>
+                        </div>
+                      </td>
                       <td className={`amount ${transaction.runningBalance > 0 ? 'positive' : 'negative'}`}>
                         {formatCurrency(transaction.runningBalance)}
                       </td>
