@@ -24,11 +24,11 @@ const ColorInfo = ({ isOpen, onClose }) => {
           </div>
           <div className="color-info-item row-expired-id">
             <span className="color-box"></span>
-            <span>কমলা: আইডি কার্ডের মেয়াদ শেষ</span>
+            <span>নীল: আইডি কার্ডের মেয়াদ শেষ</span>
           </div>{" "}
           <div className="color-info-item row-expired-passport">
             <span className="color-box"></span>
-            <span>হলুদ: পাসপোর্টের মেয়াদ শেষ</span>
+            <span>সবুজ: পাসপোর্টের মেয়াদ শেষ</span>
           </div>
         </div>
         <button

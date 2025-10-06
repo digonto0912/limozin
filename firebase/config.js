@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const getFirebaseConfig = () => {
   // Log environment status 
@@ -38,6 +39,7 @@ const getFirebaseConfig = () => {
 
 let app;
 let db;
+let auth;
 
 try {
   const firebaseConfig = getFirebaseConfig();
@@ -52,6 +54,7 @@ try {
   }
   
   db = getFirestore(app);
+  auth = getAuth(app);
 } catch (error) {
   console.error('Firebase initialization error:', error);
   if (process.env.NODE_ENV === 'development') {
@@ -67,5 +70,5 @@ try {
   }
 }
 
-export { db };
+export { db, auth };
 export default app;

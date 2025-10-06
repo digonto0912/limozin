@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
+import { requireRecordsAccess } from '../middleware/auth';
 
 export async function POST(request) {
   try {
+    // Check if user has permission to manage records
+    const authCheck = await requireRecordsAccess(request);
+    if (authCheck.error) {
+      return NextResponse.json(authCheck.error, { status: authCheck.status });
+    }
+
     const recordData = await request.json();
     const record = {
       ...recordData,

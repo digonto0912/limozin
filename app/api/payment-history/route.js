@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { collection, getDocs, query, where, addDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
+import { requireRecordsAccess } from '../middleware/auth';
 
 // GET /api/payment-history?personId=xxx
 export async function GET(request) {
   try {
+    // Check if user has permission to access payment data
+    const authCheck = await requireRecordsAccess(request);
+    if (authCheck.error) {
+      return NextResponse.json(authCheck.error, { status: authCheck.status });
+    }
+
     const { searchParams } = new URL(request.url);
     const personId = searchParams.get('personId');
     
@@ -41,6 +48,12 @@ export async function GET(request) {
 // POST /api/payment-history
 export async function POST(request) {
   try {
+    // Check if user has permission to manage payment records
+    const authCheck = await requireRecordsAccess(request);
+    if (authCheck.error) {
+      return NextResponse.json(authCheck.error, { status: authCheck.status });
+    }
+
     const paymentData = await request.json();
     console.log('Adding payment record:', paymentData);
     

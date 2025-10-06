@@ -2,18 +2,20 @@
 import { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import moment from 'moment';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function PaymentHistoryModal({ person, isOpen, onClose }) {
+  const { user } = useAuth();
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [expandedDetails, setExpandedDetails] = useState({});
 
   useEffect(() => {
-    if (isOpen && person) {
+    if (isOpen && person?.id && user?.email) {
       fetchPaymentHistory();
     }
-  }, [isOpen, person]);
+  }, [isOpen, person?.id, user?.email]);
 
   // Add modal-open class to body when modal is mounted
   useEffect(() => {
@@ -29,23 +31,57 @@ export default function PaymentHistoryModal({ person, isOpen, onClose }) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/payment-history?personId=${person.id}`);
-      if (!response.ok) {
-        // If the endpoint doesn't exist yet, return empty array
-        if (response.status === 404) {
-          console.log('Payment history collection not found, starting with empty history');
-          setPaymentHistory([]);
-          return;
-        }
-        throw new Error('Failed to fetch payment history');
+      if (!person?.id) {
+        setError('Person ID is required to fetch payment history.');
+        return;
       }
+
+      if (!user?.email) {
+        setError('You must be logged in to view payment history.');
+        return;
+      }
+      
+      const response = await fetch(`/api/payment-history?personId=${person.id}`, {
+        headers: {
+          'x-user-email': user.email
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        switch (response.status) {
+          case 401:
+            setError('You are not authorized to view payment history. Please log in.');
+            break;
+          case 403:
+            setError('You do not have permission to view payment history.');
+            break;
+          case 404:
+            console.log('Payment history collection not found, starting with empty history');
+            setPaymentHistory([]);
+            return;
+          case 400:
+            setError(errorData.error || 'Invalid request parameters.');
+            break;
+          case 500:
+            setError(errorData.error || 'Server error occurred while fetching payment history.');
+            break;
+          default:
+            setError(errorData.error || `Failed to fetch payment history (${response.status})`);
+        }
+        return;
+      }
+      
       const data = await response.json();
-      setPaymentHistory(data);
+      setPaymentHistory(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching payment history:', error);
-      // For now, just start with empty history instead of showing error
-      setPaymentHistory([]);
-      setError(null); // Don't show error to user yet
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        setError('Network error: Unable to connect to the server.');
+      } else {
+        setError('An unexpected error occurred while fetching payment history.');
+      }
     } finally {
       setIsLoading(false);
     }
