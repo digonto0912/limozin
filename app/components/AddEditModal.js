@@ -5,6 +5,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 export default function AddEditModal({ record = null, onClose, onSave }) {
   const [formData, setFormData] = useState({
     name: '',
+    passportNumber: '',
     passportExpiry: '',
     idNumber: '',
     idExpiry: '',
@@ -29,6 +30,7 @@ export default function AddEditModal({ record = null, onClose, onSave }) {
     if (record) {
       setFormData({
         ...record,
+        passportNumber: record.passportNumber || '',
         passportExpiry: record.passportExpiry?.split('T')[0] || '',
         idExpiry: record.idExpiry?.split('T')[0] || '',
         joinDate: record.joinDate?.split('T')[0] || '',
@@ -168,6 +170,17 @@ export default function AddEditModal({ record = null, onClose, onSave }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="form-group">
+              <label htmlFor="passportNumber">Passport Number</label>
+              <input
+                type="text"
+                id="passportNumber"
+                placeholder="Enter passport number"
+                value={formData.passportNumber}
+                onChange={(e) => setFormData({ ...formData, passportNumber: e.target.value })}
+              />
+            </div>
+
+            <div className="form-group">
               <label htmlFor="passportExpiry">Passport Expiry Date</label>
               <input
                 type="date"
@@ -176,7 +189,9 @@ export default function AddEditModal({ record = null, onClose, onSave }) {
                 onChange={(e) => setFormData({ ...formData, passportExpiry: e.target.value })}
               />
             </div>
+          </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
             <div className="form-group">
               <label htmlFor="joinDate">Join Date</label>
               <input

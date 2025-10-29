@@ -339,6 +339,7 @@ export default function Home() {
     const mainHeaders = [
       "Record ID",
       "Name",
+      "Passport Number",
       "Passport Expiry",
       "ID Number",
       "ID Expiry",
@@ -368,6 +369,7 @@ export default function Home() {
       const row = [
         record.id || "",
         `"${(record.name || "").replace(/"/g, '""')}"`,
+        record.passportNumber || "",
         formatDate(record.passportExpiry) || "",
         record.idNumber || "",
         formatDate(record.idExpiry) || "",

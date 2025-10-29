@@ -75,8 +75,8 @@ erp-monitoring-app/
 
 ### 5.2 Record Table (Below Chart)
 
-| Name | Passport Expiry | ID No. | ID Expiry | Join Date | Phone | Due Balance | Notes |
-| ---- | --------------- | ------ | --------- | --------- | ----- | ----------- | ----- |
+| Name | Passport No. | Passport Expiry | ID No. | ID Expiry | Join Date | Phone | Due Balance | Notes |
+| ---- | ------------ | --------------- | ------ | --------- | --------- | ----- | ----------- | ----- |
 
 #### Features:
 
@@ -123,6 +123,7 @@ backend-end: http://localhost:3002/api
 ```json
 {
   "name": "Rahim Uddin",
+  "passportNumber": "A1234567",
   "passportExpiry": "2025-11-10",
   "idNumber": "1234567890",
   "idExpiry": "2026-03-15",
@@ -223,10 +224,10 @@ backend-end: http://localhost:3002/api
 
 ## 📋 14. Example Data (For Seeding)
 
-| Name        | Passport Expiry | ID No.     | ID Expiry  | Join Date  | Phone       | Due Balance | Notes           |
-| ----------- | --------------- | ---------- | ---------- | ---------- | ----------- | ----------- | --------------- |
-| Rahim Uddin | 2025-11-10      | 1234567890 | 2026-03-15 | 2022-06-12 | 01712345678 | 15000       | Delayed payment |
-| Karim Ali   | 2024-07-01      | 9876543210 | 2024-09-12 | 2021-03-22 | 01876543210 | 0           | All good        |
+| Name        | Passport No. | Passport Expiry | ID No.     | ID Expiry  | Join Date  | Phone       | Due Balance | Notes           |
+| ----------- | ------------ | --------------- | ---------- | ---------- | ---------- | ----------- | ----------- | --------------- |
+| Rahim Uddin | A1234567     | 2025-11-10      | 1234567890 | 2026-03-15 | 2022-06-12 | 01712345678 | 15000       | Delayed payment |
+| Karim Ali   | B7654321     | 2024-07-01      | 9876543210 | 2024-09-12 | 2021-03-22 | 01876543210 | 0           | All good        |
 
 ---
 
@@ -250,6 +251,7 @@ Let the admin:
 | Label           | Input    | Field Name       | Validation  |
 | --------------- | -------- | ---------------- | ----------- |
 | Name            | Text     | `name`           | Required    |
+| Passport Number | Text     | `passportNumber` | Optional    |
 | Passport Expiry | Date     | `passportExpiry` | Optional    |
 | ID Number       | Text     | `idNumber`       | Optional    |
 | ID Expiry       | Date     | `idExpiry`       | Optional    |

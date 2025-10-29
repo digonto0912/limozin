@@ -74,6 +74,7 @@ export default function Table({
 
   const columns = [
     { field: "name", label: "Name", sortable: true },
+    { field: "passportNumber", label: "Passport Number", sortable: true },
     { field: "passportExpiry", label: "Passport Expiry", sortable: true },
     { field: "idNumber", label: "ID Number", sortable: true },
     { field: "idExpiry", label: "ID Expiry", sortable: true },
@@ -163,6 +164,7 @@ export default function Table({
     const searchLower = searchTerm.toLowerCase();
     return (
       record.name?.toLowerCase().includes(searchLower) ||
+      record.passportNumber?.toLowerCase().includes(searchLower) ||
       record.idNumber?.toLowerCase().includes(searchLower) ||
       record.phone?.toLowerCase().includes(searchLower) ||
       (record.dueBalance && record.dueBalance.toString().includes(searchTerm))
@@ -212,7 +214,7 @@ export default function Table({
           <MagnifyingGlassIcon className="search-icon" />
           <input
             type="text"
-            placeholder="Search by name, phone, or ID..."
+            placeholder="Search by name, passport, phone, or ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -271,6 +273,7 @@ export default function Table({
               filteredRecords.map((record) => (
                 <tr key={record.id} className={getHighlightClass(record)}>
                   <td>{record.name}</td>
+                  <td>{record.passportNumber}</td>
                   <td>
                     <span
                       className={
@@ -345,7 +348,7 @@ export default function Table({
                           column.field
                         )
                       ? formatDate(record[column.field])
-                      : record[column.field]}
+                      : record[column.field] || "-"}
                   </span>
                 </div>
               ))}

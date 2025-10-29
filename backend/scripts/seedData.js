@@ -23,6 +23,7 @@ const dateToTimestamp = (dateStr) => {
 const sampleRecords = [
   {
     name: "Rahim Uddin",
+    passportNumber: "A1234567",
     passportExpiry: "2026-11-10",
     idNumber: "1234567890",
     idExpiry: "2026-03-15",
@@ -33,6 +34,7 @@ const sampleRecords = [
   },
   {
     name: "Karim Ali",
+    passportNumber: "B7654321",
     passportExpiry: "2026-07-01",
     idNumber: "9876543210",
     idExpiry: "2024-05-12",
@@ -43,6 +45,7 @@ const sampleRecords = [
   },
   {
     name: "Mohammad Hassan",
+    passportNumber: "C5432167",
     passportExpiry: "2024-12-30",
     idNumber: "5432167890",
     idExpiry: "2026-08-20",
@@ -53,6 +56,7 @@ const sampleRecords = [
   },
   {
     name: "Abdul Kader",
+    passportNumber: "D6789054",
     passportExpiry: "2026-03-25",
     idNumber: "6789054321",
     idExpiry: "2024-04-30",
@@ -63,6 +67,7 @@ const sampleRecords = [
   },
   {
     name: "Fatima Begum",
+    passportNumber: "E3456789",
     passportExpiry: "2026-05-18",
     idNumber: "3456789012",
     idExpiry: "2026-12-15",
@@ -73,6 +78,7 @@ const sampleRecords = [
   },
   {
     name: "Jamal Ahmed",
+    passportNumber: "F8901234",
     passportExpiry: "2024-07-05",
     idNumber: "8901234567",
     idExpiry: "2024-05-28",
@@ -83,6 +89,7 @@ const sampleRecords = [
   },
   {
     name: "Nasrin Akter",
+    passportNumber: "G4567890",
     passportExpiry: "2026-09-15",
     idNumber: "4567890123",
     idExpiry: "2026-12-31",
@@ -93,6 +100,7 @@ const sampleRecords = [
   },
   {
     name: "Ahmed Khan",
+    passportNumber: "H7890123",
     passportExpiry: "2024-08-20",
     idNumber: "7890123456",
     idExpiry: "2026-11-15",
@@ -103,6 +111,7 @@ const sampleRecords = [
   },
   {
     name: "Salma Khatun",
+    passportNumber: "I2345678",
     passportExpiry: "2026-10-25",
     idNumber: "2345678901",
     idExpiry: "2026-09-30",
@@ -113,6 +122,7 @@ const sampleRecords = [
   },
   {
     name: "Omar Faruk",
+    passportNumber: "J6789012",
     passportExpiry: "2026-12-01",
     idNumber: "6789012345",
     idExpiry: "2026-10-15",
