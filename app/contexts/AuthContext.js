@@ -33,7 +33,12 @@ export const AuthProvider = ({ children }) => {
         const redirectResult = await handleRedirectResult();
         if (redirectResult.success && redirectResult.user) {
           console.log('AuthContext: Redirect authentication successful:', redirectResult.user.email);
-          // The auth state change will handle the rest
+          // Force immediate state update for redirect users
+          if (isMounted) {
+            setUser(redirectResult.user);
+            setLoading(false);
+            setInitializing(false);
+          }
         } else {
           console.log('AuthContext: No redirect result or no user in result');
         }
@@ -43,8 +48,8 @@ export const AuthProvider = ({ children }) => {
       }
     };
     
-    // Check redirect result with a small delay to ensure Firebase is ready
-    setTimeout(checkRedirectResult, 100);
+    // Check redirect result immediately, then set up auth listener
+    checkRedirectResult();
     
     const unsubscribe = onAuthStateChange(async (user) => {
       if (!isMounted) return;
@@ -91,12 +96,12 @@ export const AuthProvider = ({ children }) => {
 
     // Set a timeout as a safety net to prevent infinite loading
     const timeoutId = setTimeout(() => {
-      if (isMounted) {
+      if (isMounted && loading) {
         console.warn('Auth initialization timeout - forcing loading to false');
         setLoading(false);
         setInitializing(false);
       }
-    }, 8000); // 8 second timeout to allow for redirect authentication
+    }, 5000); // 5 second timeout for faster response
 
     return () => {
       isMounted = false;
@@ -130,7 +135,7 @@ export const AuthProvider = ({ children }) => {
       console.log('User not authenticated on protected page, redirecting to login with reload...');
       window.location.href = '/login';
     }
-  }, [user, pathname, initializing, loading, router]);
+  }, [user, pathname, initializing, loading]);
 
   const checkPermission = (permission) => {
     return hasPermission(user, permission);

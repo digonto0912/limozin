@@ -12,35 +12,14 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Handle redirect result on component mount
+  // Let AuthContext handle redirect results to avoid conflicts
   useEffect(() => {
-    const checkRedirectResult = async () => {
-      console.log('Login page: Checking for redirect result...');
-      setIsLoading(true);
-      
-      try {
-        const result = await handleRedirectResult();
-        if (result.success && result.user) {
-          console.log('Login page: Redirect sign-in successful, reloading to home...');
-          // Force reload to home page for clean state
-          window.location.href = '/';
-          return;
-        } else if (result.error && result.error !== 'No redirect result found') {
-          console.error('Login page: Redirect result error:', result.error);
-          setError(result.error);
-        }
-      } catch (error) {
-        console.error('Login page: Error handling redirect result:', error);
-        setError('Authentication failed. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Small delay to ensure Firebase is initialized
-    const timer = setTimeout(checkRedirectResult, 100);
-    return () => clearTimeout(timer);
-  }, [router]);
+    // If user is already authenticated, redirect to home
+    if (user) {
+      console.log('User already authenticated, redirecting to home...');
+      window.location.href = '/';
+    }
+  }, [user]);
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);

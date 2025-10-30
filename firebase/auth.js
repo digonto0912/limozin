@@ -181,13 +181,18 @@ export const getCurrentUser = () => {
 export const handleRedirectResult = async () => {
   try {
     console.log('Checking for redirect result...');
+    
+    // Add a small delay to ensure Firebase is fully initialized
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     const result = await getRedirectResult(auth);
     
     if (result && result.user) {
       console.log('Redirect authentication successful:', {
         email: result.user.email,
         uid: result.user.uid,
-        displayName: result.user.displayName
+        displayName: result.user.displayName,
+        accessToken: result._tokenResponse?.access_token ? 'present' : 'missing'
       });
       return {
         success: true,
@@ -208,9 +213,17 @@ export const handleRedirectResult = async () => {
   } catch (error) {
     console.error('Redirect result error:', {
       code: error.code,
-      message: error.message,
-      stack: error.stack
+      message: error.message
     });
+    
+    // Don't treat "no redirect result" as an error
+    if (error.code === 'auth/no-auth-event') {
+      return {
+        success: false,
+        error: 'No redirect result found'
+      };
+    }
+    
     return {
       success: false,
       error: getAuthErrorMessage(error.code)
