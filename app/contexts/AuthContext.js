@@ -5,6 +5,11 @@ import { onAuthStateChange, handleRedirectResult } from '../../firebase/auth';
 import { getUserRole, hasPermission, isMasterAdmin } from '../../firebase/roles';
 import { ensureUserInFirestore } from '../../firebase/users';
 
+// Import diagnostics in development
+if (process.env.NODE_ENV === 'development') {
+  import('../../utils/firebase-diagnostics').catch(console.error);
+}
+
 const AuthContext = createContext();
 
 export const useAuth = () => {

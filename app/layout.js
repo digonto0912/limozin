@@ -2,6 +2,11 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from './contexts/AuthContext';
 
+// Import Firebase init fix to prevent auto-initialization
+if (typeof window !== 'undefined') {
+  import('../utils/firebase-init-fix').catch(console.error);
+}
+
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
@@ -24,6 +29,22 @@ export default function RootLayout({ children }) {
               // Clear any Firebase hosting context
               if (typeof window !== 'undefined') {
                 delete window.__FIREBASE_DEFAULTS__;
+                
+                // Additional prevention measures
+                if (window.firebase) {
+                  delete window.firebase;
+                }
+                
+                // Override fetch for init.json requests
+                const originalFetch = window.fetch;
+                window.fetch = function(...args) {
+                  const url = args[0];
+                  if (typeof url === 'string' && url.includes('/__/firebase/init.json')) {
+                    console.warn('Blocked Firebase auto-init request:', url);
+                    return Promise.reject(new Error('Firebase auto-initialization blocked'));
+                  }
+                  return originalFetch.apply(this, args);
+                };
               }
             `
           }}
