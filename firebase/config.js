@@ -21,16 +21,28 @@ const getFirebaseConfig = () => {
     }
   }
 
-  // In development, we can use environment variables from .env
-  // In production, we must use environment variables from Vercel
+  // IMPORTANT: For Firebase Auth to work correctly on Vercel/custom domains,
+  // you must use the Firebase project's authDomain, NOT your custom domain.
+  // The custom domain must be added to Firebase Console > Authentication > Settings > Authorized domains
+  
   const config = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+    authDomain: 'limozin-85645.firebaseapp.com', // Always use Firebase's authDomain
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
     storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || ''
   };
+
+  // Log the domain configuration for debugging
+  if (typeof window !== 'undefined') {
+    const currentDomain = window.location.hostname;
+    console.log('Domain Configuration:', {
+      currentDomain,
+      authDomain: config.authDomain,
+      note: 'Make sure your current domain is added to Firebase Console > Authentication > Settings > Authorized domains'
+    });
+  }
 
   // Validate configuration
   const missingVars = [];

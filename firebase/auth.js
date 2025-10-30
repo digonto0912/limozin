@@ -11,6 +11,8 @@ import { auth } from './config';
 // Sign in with Google
 export const signInWithGoogle = async () => {
   try {
+    console.log('Starting Google authentication...');
+    
     const provider = new GoogleAuthProvider();
     // Add additional scopes if needed
     provider.addScope('profile');
@@ -21,40 +23,21 @@ export const signInWithGoogle = async () => {
       prompt: 'select_account'
     });
     
-    // Check if we're in production or should avoid popup
-    const isProduction = typeof window !== 'undefined' && 
-                        (window.location.hostname.includes('vercel.app') || 
-                         window.location.hostname.includes('.app') ||
-                         window.location.protocol === 'https:' ||
-                         window.location.hostname !== 'localhost');
+    // Always try popup first - Firebase will handle domain authorization properly
+    console.log('Attempting popup authentication with Firebase authDomain...');
     
-    // Force redirect in production to completely avoid COOP issues
-    if (isProduction) {
-      console.log('Production/HTTPS environment detected, using redirect authentication to avoid COOP');
-      try {
-        await signInWithRedirect(auth, provider);
-        return {
-          success: true,
-          user: null, // User will be available after redirect
-          isRedirect: true
-        };
-      } catch (redirectError) {
-        console.error('Redirect authentication failed:', redirectError);
-        return {
-          success: false,
-          error: `Redirect authentication failed: ${getAuthErrorMessage(redirectError.code)}`
-        };
-      }
-    }
-    
-    // Development environment - try popup but be ready to fallback
-    console.log('Development environment detected, trying popup with redirect fallback');
     try {
       const result = await signInWithPopup(auth, provider);
+      console.log('Popup authentication successful:', {
+        email: result.user.email,
+        uid: result.user.uid,
+        displayName: result.user.displayName
+      });
+      
       return {
         success: true,
         user: result.user,
-        shouldReload: true // Indicate that a reload is recommended
+        method: 'popup'
       };
     } catch (popupError) {
       console.warn('Popup authentication failed:', {
@@ -73,14 +56,27 @@ export const signInWithGoogle = async () => {
         };
       }
       
+      // For auth/unauthorized-domain or other domain issues, log helpful info
+      if (popupError.code === 'auth/unauthorized-domain') {
+        console.error('Unauthorized domain error. Please add your domain to Firebase Console:');
+        console.error('1. Go to Firebase Console > Authentication > Settings');
+        console.error('2. Add your domain to "Authorized domains"');
+        console.error('Current domain:', window.location.hostname);
+        return {
+          success: false,
+          error: 'Domain not authorized. Please contact administrator.'
+        };
+      }
+      
       // For other popup errors, try redirect fallback
+      console.log('Attempting redirect fallback...');
       try {
-        console.log('Using redirect fallback for popup error');
         await signInWithRedirect(auth, provider);
         return {
           success: true,
           user: null, // User will be available after redirect
-          isRedirect: true
+          isRedirect: true,
+          method: 'redirect'
         };
       } catch (redirectError) {
         console.error('Both popup and redirect failed:', redirectError);

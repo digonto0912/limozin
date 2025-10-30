@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext';
 // Import Firebase init fix to prevent auto-initialization
 if (typeof window !== 'undefined') {
   import('../utils/firebase-init-fix').catch(console.error);
+  import('../utils/domain-checker').catch(console.error);
 }
 
 const inter = Inter({ subsets: ['latin'] });
