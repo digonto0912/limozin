@@ -1,29 +1,78 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { signUpWithGoogle } from '../../firebase/auth';
+import { signUpWithGoogle, handleRedirectResult } from '../../firebase/auth';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { user, loading, initializing } = useAuth();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Handle redirect result on component mount
+  useEffect(() => {
+    const checkRedirectResult = async () => {
+      setIsLoading(true);
+      try {
+        const result = await handleRedirectResult();
+        if (result.success && result.user) {
+          console.log('Redirect sign-up successful, reloading to home...');
+          // Force reload to home page for clean state
+          window.location.href = '/';
+          return;
+        }
+      } catch (error) {
+        console.error('Error handling redirect result:', error);
+        setError('Authentication failed. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkRedirectResult();
+  }, [router]);
 
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
     setError('');
 
-    const result = await signUpWithGoogle();
-    
-    if (result.success) {
-      router.push('/');
-    } else {
-      setError(result.error);
+    try {
+      const result = await signUpWithGoogle();
+      
+      if (result.success) {
+        if (result.isRedirect) {
+          // Don't set loading to false for redirect, page will reload
+          console.log('Redirecting for authentication...');
+          return;
+        } else {
+          // Popup authentication succeeded - reload to home page
+          console.log('Popup authentication successful, reloading to home...');
+          window.location.href = '/';
+          return;
+        }
+        } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      console.error('Sign up error:', error);
+      setError('Authentication failed. Please try again.');
     }
     
     setIsLoading(false);
   };
+
+  // Show loading while AuthContext is initializing
+  if (initializing || loading) {
+    return <div className="auth-container">
+      <div className="auth-card">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    </div>;
+  }
 
   return (
     <div className="auth-container">

@@ -12,6 +12,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <script src="/coop-error-handler.js" defer></script>
+      </head>
       <body className={inter.className}>
         <AuthProvider>
           {children}

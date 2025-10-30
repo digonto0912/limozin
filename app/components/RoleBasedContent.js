@@ -6,7 +6,10 @@ import { UserIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/24/ou
 export default function RoleBasedContent({ children, adminContent, userContent }) {
   const { user, userRole, hasPermission, loading } = useAuth();
 
+  console.log('RoleBasedContent render:', { loading, hasUser: !!user, userRole });
+
   if (loading) {
+    console.log('RoleBasedContent: showing loading');
     return (
       <div className="dashboard-loading">
         <div className="loading-spinner"></div>
@@ -19,8 +22,11 @@ export default function RoleBasedContent({ children, adminContent, userContent }
   const canManageRecords = hasPermission('canManageRecords');
   const canViewAllData = hasPermission('canViewAllUsers') || hasPermission('canManageRecords');
 
+  console.log('RoleBasedContent permissions:', { canManageRecords, canViewAllData, userRole });
+
   // If user can manage records, show full dashboard
   if (canManageRecords) {
+    console.log('RoleBasedContent: user can manage records, showing full dashboard');
     return children;
   }
 

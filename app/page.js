@@ -31,12 +31,38 @@ export default function Home() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadPin] = useState("1234"); // Default PIN - you can change this
 
+  console.log('Home component render:', { 
+    hasUser: !!user, 
+    userEmail: user?.email, 
+    isLoading, 
+    recordsCount: records.length 
+  });
+
   useEffect(() => {
+    console.log('Home useEffect triggered:', { hasUser: !!user, userEmail: user?.email });
+    
     // Only fetch records when user is authenticated
     if (user && user.email) {
+      console.log('User authenticated, fetching records...');
       fetchRecords();
+    } else {
+      console.log('User not authenticated or no email, skipping records fetch');
+      setIsLoading(false);
     }
   }, [user]);
+
+  // Safety timeout to prevent infinite loading
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (isLoading) {
+        console.warn('Loading timeout reached - forcing loading to false');
+        setIsLoading(false);
+        setError('Loading timeout. Please refresh the page.');
+      }
+    }, 15000); // 15 second timeout
+
+    return () => clearTimeout(timeoutId);
+  }, [isLoading]);
 
   const showNotification = (message, type = "success") => {
     setToastMessage(message);
@@ -46,6 +72,8 @@ export default function Home() {
   };
 
   const fetchRecords = async (retryCount = 0) => {
+    console.log('fetchRecords called:', { retryCount, hasUser: !!user, userEmail: user?.email });
+    
     // Don't fetch if user is not authenticated
     if (!user || !user.email) {
       console.log("User not authenticated, skipping records fetch");
@@ -56,11 +84,15 @@ export default function Home() {
     try {
       setError(null);
       setIsLoading(true);
+      console.log("Fetching records from API...");
+      
       const response = await fetch("/api/records", {
         headers: {
           "x-user-email": user.email,
         },
       });
+
+      console.log("API response:", { status: response.status, ok: response.ok });
 
       if (!response.ok) {
         if (response.status === 403) {
@@ -574,8 +606,50 @@ export default function Home() {
     }
   };
 
+  // Add some debug info for production issues
+  console.log('Home component final render decision:', { 
+    isLoading, 
+    recordsLength: records.length, 
+    shouldShowLoading: isLoading && records.length === 0,
+    error: !!error
+  });
+
+  // Emergency bypass for production issues
+  const handleEmergencyBypass = () => {
+    console.log('Emergency bypass triggered');
+    setIsLoading(false);
+    setError(null);
+    if (user && user.email) {
+      fetchRecords();
+    }
+  };
+
   if (isLoading && records.length === 0) {
-    return <Loading />;
+    console.log('Showing loading screen');
+    return (
+      <div className="loading-overlay">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <p>Loading...</p>
+          {process.env.NODE_ENV === 'production' && (
+            <button 
+              onClick={handleEmergencyBypass}
+              style={{
+                marginTop: '1rem',
+                padding: '0.5rem 1rem',
+                background: '#ff6b6b',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Emergency Bypass (Click if stuck)
+            </button>
+          )}
+        </div>
+      </div>
+    );
   }
 
   const filteredRecords = getFilteredRecords();

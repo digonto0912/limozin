@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { logOut } from '../../firebase/auth';
 import { ArrowRightOnRectangleIcon, UserIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
@@ -10,13 +11,21 @@ import AdminPanel from './AdminPanel';
 export default function Header() {
   const { user, isMasterAdmin } = useAuth();
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const router = useRouter();
 
   const handleLogout = async () => {
     if (window.confirm('Are you sure you want to sign out?')) {
-      const result = await logOut();
-      if (result.success) {
-        // User will be redirected by the auth state change
-      } else {
+      try {
+        const result = await logOut();
+        if (result.success) {
+          console.log('Sign out successful - reloading page...');
+          // Force a complete page reload to ensure clean state
+          window.location.href = '/login';
+        } else {
+          alert('Failed to sign out. Please try again.');
+        }
+      } catch (error) {
+        console.error('Sign out error:', error);
         alert('Failed to sign out. Please try again.');
       }
     }

@@ -1,29 +1,85 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { signInWithGoogle } from '../../firebase/auth';
+import { signInWithGoogle, handleRedirectResult } from '../../firebase/auth';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { user, loading, initializing } = useAuth();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Handle redirect result on component mount
+  useEffect(() => {
+    const checkRedirectResult = async () => {
+      console.log('Login page: Checking for redirect result...');
+      setIsLoading(true);
+      
+      try {
+        const result = await handleRedirectResult();
+        if (result.success && result.user) {
+          console.log('Login page: Redirect sign-in successful, reloading to home...');
+          // Force reload to home page for clean state
+          window.location.href = '/';
+          return;
+        } else if (result.error && result.error !== 'No redirect result found') {
+          console.error('Login page: Redirect result error:', result.error);
+          setError(result.error);
+        }
+      } catch (error) {
+        console.error('Login page: Error handling redirect result:', error);
+        setError('Authentication failed. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Small delay to ensure Firebase is initialized
+    const timer = setTimeout(checkRedirectResult, 100);
+    return () => clearTimeout(timer);
+  }, [router]);
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setError('');
 
-    const result = await signInWithGoogle();
-    
-    if (result.success) {
-      router.push('/');
-    } else {
-      setError(result.error);
+    try {
+      const result = await signInWithGoogle();
+      
+      if (result.success) {
+        if (result.isRedirect) {
+          // Don't set loading to false for redirect, page will reload
+          console.log('Redirecting for authentication...');
+          return;
+        } else {
+          // Popup authentication succeeded - reload to home page
+          console.log('Popup authentication successful, reloading to home...');
+          window.location.href = '/';
+          return;
+        }
+      } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      console.error('Sign in error:', error);
+      setError('Authentication failed. Please try again.');
     }
     
     setIsLoading(false);
   };
+
+  // Show loading while AuthContext is initializing
+  if (initializing || loading) {
+    return <div className="auth-container">
+      <div className="auth-card">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    </div>;
+  }
 
   return (
     <div className="auth-container">
