@@ -57,13 +57,25 @@ export const signInWithGoogle = async () => {
         shouldReload: true // Indicate that a reload is recommended
       };
     } catch (popupError) {
-      console.warn('Popup authentication failed, using redirect fallback:', {
+      console.warn('Popup authentication failed:', {
         code: popupError.code,
         message: popupError.message
       });
       
-      // Any popup error should trigger redirect fallback
+      // Check if user cancelled the popup
+      if (popupError.code === 'auth/popup-closed-by-user' || 
+          popupError.code === 'auth/cancelled-popup-request') {
+        console.log('User cancelled popup authentication');
+        return {
+          success: false,
+          error: 'cancelled',
+          cancelled: true
+        };
+      }
+      
+      // For other popup errors, try redirect fallback
       try {
+        console.log('Using redirect fallback for popup error');
         await signInWithRedirect(auth, provider);
         return {
           success: true,
@@ -210,11 +222,11 @@ export const handleRedirectResult = async () => {
 const getAuthErrorMessage = (errorCode) => {
   switch (errorCode) {
     case 'auth/popup-closed-by-user':
-      return 'Sign-in popup was closed before completing authentication.';
+      return 'cancelled'; // Special case for popup cancellation
     case 'auth/popup-blocked':
       return 'Sign-in popup was blocked by your browser. Please allow popups and try again.';
     case 'auth/cancelled-popup-request':
-      return 'Another popup is already open. Please close it and try again.';
+      return 'cancelled'; // Special case for popup cancellation
     case 'auth/user-disabled':
       return 'This account has been disabled.';
     case 'auth/account-exists-with-different-credential':

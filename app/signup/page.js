@@ -39,6 +39,12 @@ export default function SignupPage() {
     setIsLoading(true);
     setError('');
 
+    // Set a safety timeout to reset loading state if something goes wrong
+    const timeoutId = setTimeout(() => {
+      console.warn('Authentication timeout - resetting loading state');
+      setIsLoading(false);
+    }, 30000); // 30 second timeout
+
     try {
       const result = await signUpWithGoogle();
       
@@ -53,18 +59,25 @@ export default function SignupPage() {
           window.location.href = '/';
           return;
         }
+      } else {
+        // Check if user cancelled the popup
+        if (result.cancelled || result.error === 'cancelled') {
+          console.log('User cancelled authentication');
+          // Don't show error for cancellation, just reset loading
+          setError('');
         } else {
-        setError(result.error);
+          setError(result.error);
+        }
       }
     } catch (error) {
       console.error('Sign up error:', error);
       setError('Authentication failed. Please try again.');
     }
     
+    // Always reset loading state and clear timeout
+    clearTimeout(timeoutId);
     setIsLoading(false);
-  };
-
-  // Show loading while AuthContext is initializing
+  };  // Show loading while AuthContext is initializing
   if (initializing || loading) {
     return <div className="auth-container">
       <div className="auth-card">

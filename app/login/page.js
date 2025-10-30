@@ -46,6 +46,12 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
 
+    // Set a safety timeout to reset loading state if something goes wrong
+    const timeoutId = setTimeout(() => {
+      console.warn('Authentication timeout - resetting loading state');
+      setIsLoading(false);
+    }, 30000); // 30 second timeout
+
     try {
       const result = await signInWithGoogle();
       
@@ -61,13 +67,22 @@ export default function LoginPage() {
           return;
         }
       } else {
-        setError(result.error);
+        // Check if user cancelled the popup
+        if (result.cancelled || result.error === 'cancelled') {
+          console.log('User cancelled authentication');
+          // Don't show error for cancellation, just reset loading
+          setError('');
+        } else {
+          setError(result.error);
+        }
       }
     } catch (error) {
       console.error('Sign in error:', error);
       setError('Authentication failed. Please try again.');
     }
     
+    // Always reset loading state and clear timeout
+    clearTimeout(timeoutId);
     setIsLoading(false);
   };
 
