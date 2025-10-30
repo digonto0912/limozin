@@ -14,6 +14,20 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <script src="/coop-error-handler.js" defer></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Prevent Firebase auto-initialization
+              window.__FIREBASE_DEFAULTS__ = null;
+              window.FIREBASE_APPCHECK_DEBUG_TOKEN = false;
+              
+              // Clear any Firebase hosting context
+              if (typeof window !== 'undefined') {
+                delete window.__FIREBASE_DEFAULTS__;
+              }
+            `
+          }}
+        />
       </head>
       <body className={inter.className}>
         <AuthProvider>
