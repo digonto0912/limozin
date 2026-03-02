@@ -4,10 +4,18 @@ import { db } from '../../../../firebase/config';
 import { MASTER_ADMIN_EMAIL } from '../../../../firebase/roles';
 import { deleteFirebaseUser } from '../../../../firebase/admin';
 
+// Helper to extract UID from URL path: /api/users/[uid]
+function getUserUid(request) {
+  const url = new URL(request.url);
+  const segments = url.pathname.split('/').filter(Boolean);
+  // segments: ['api', 'users', '<uid>']
+  return segments[2] || null;
+}
+
 // DELETE /api/users/[uid] - Delete user completely including Firebase Auth
-export async function DELETE(request, { params }) {
+export async function DELETE(request) {
   try {
-    const { uid } = params;
+    const uid = getUserUid(request);
     const userEmail = request.headers.get('x-user-email');
     const targetUserEmail = request.headers.get('x-target-email');
     
@@ -95,9 +103,9 @@ export async function DELETE(request, { params }) {
 }
 
 // GET /api/users/[uid] - Get specific user details
-export async function GET(request, { params }) {
+export async function GET(request) {
   try {
-    const { uid } = params;
+    const uid = getUserUid(request);
     const userEmail = request.headers.get('x-user-email');
     
     // Check if user is master admin

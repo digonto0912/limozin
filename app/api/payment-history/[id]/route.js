@@ -1,16 +1,33 @@
 import { NextResponse } from 'next/server';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../../firebase/config';
+import { getCollectionName, isValidProduct, DEFAULT_PRODUCT_ID } from '../../../config/products';
+
+// Helper to extract ID from URL path: /api/payment-history/[id]
+function getPersonId(request) {
+  const url = new URL(request.url);
+  const segments = url.pathname.split('/').filter(Boolean);
+  // segments: ['api', 'payment-history', '<id>']
+  return segments[2] || null;
+}
 
 // API route for fetching payment history by person ID
-export async function GET(request, { params }) {
+export async function GET(request) {
   try {
-    const { id } = params;
-    console.log('Payment history API called with ID:', id);
+    const id = getPersonId(request);
+    const { searchParams } = new URL(request.url);
+    const productId = searchParams.get('product') || DEFAULT_PRODUCT_ID;
+
+    if (!isValidProduct(productId)) {
+      return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
+    }
+
+    const colName = getCollectionName(productId, 'paymentHistory');
+    console.log(`Payment history API called with ID: ${id}, product: ${productId}, collection: ${colName}`);
     
     // Query the paymentHistory collection for this person
     const q = query(
-      collection(db, 'paymentHistory'), 
+      collection(db, colName), 
       where('personId', '==', id)
     );
     

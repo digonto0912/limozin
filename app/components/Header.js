@@ -2,16 +2,25 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { logOut } from '../../firebase/auth';
 import { ArrowRightOnRectangleIcon, UserIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import AdminPanel from './AdminPanel';
+import { getProductById } from '../config/products';
 
-export default function Header() {
+export default function Header({ productId }) {
   const { user, isMasterAdmin } = useAuth();
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Get product info from prop or URL
+  const resolvedProductId = productId || (() => {
+    const match = pathname?.match(/^\/product\/([^/]+)/);
+    return match ? match[1] : null;
+  })();
+  const product = resolvedProductId ? getProductById(resolvedProductId) : null;
 
   const handleLogout = async () => {
     if (window.confirm('Are you sure you want to sign out?')) {
@@ -44,8 +53,8 @@ export default function Header() {
             className="nav-logo"
           />
           <div className="nav-text">
-            <h1>Save Way Limousine</h1>
-            <p className="nav-subtitle">Track employee/customer documents and payment dues</p>
+            <h1>{product ? product.name : 'Save Way Limousine'}</h1>
+            <p className="nav-subtitle">{product ? product.description : 'Track employee/customer documents and payment dues'}</p>
           </div>
         </div>
         

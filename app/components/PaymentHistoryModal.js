@@ -4,7 +4,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import moment from 'moment';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function PaymentHistoryModal({ person, isOpen, onClose }) {
+export default function PaymentHistoryModal({ person, isOpen, onClose, productId }) {
   const { user } = useAuth();
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,7 @@ export default function PaymentHistoryModal({ person, isOpen, onClose }) {
         return;
       }
       
-      const response = await fetch(`/api/payment-history?personId=${person.id}`, {
+      const response = await fetch(`/api/payment-history?personId=${person.id}${productId ? `&product=${productId}` : ''}`, {
         headers: {
           'x-user-email': user.email
         }

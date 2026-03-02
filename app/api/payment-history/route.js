@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { collection, getDocs, query, where, addDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
 import { requireRecordsAccess } from '../middleware/auth';
+import { getCollectionName, isValidProduct, DEFAULT_PRODUCT_ID } from '../../config/products';
 
-// GET /api/payment-history?personId=xxx
+// GET /api/payment-history?personId=xxx&product=xxx
 export async function GET(request) {
   try {
     // Check if user has permission to access payment data
@@ -14,16 +15,22 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const personId = searchParams.get('personId');
+    const productId = searchParams.get('product') || DEFAULT_PRODUCT_ID;
     
     if (!personId) {
       return NextResponse.json({ error: 'personId is required' }, { status: 400 });
     }
+
+    if (!isValidProduct(productId)) {
+      return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
+    }
     
-    console.log('Payment history API called with personId:', personId);
+    const colName = getCollectionName(productId, 'paymentHistory');
+    console.log(`Payment history API called with personId: ${personId}, product: ${productId}, collection: ${colName}`);
     
     // Query the paymentHistory collection for this person
     const q = query(
-      collection(db, 'paymentHistory'), 
+      collection(db, colName), 
       where('personId', '==', personId)
     );
     
@@ -45,7 +52,7 @@ export async function GET(request) {
   }
 }
 
-// POST /api/payment-history
+// POST /api/payment-history?product=xxx
 export async function POST(request) {
   try {
     // Check if user has permission to manage payment records
@@ -54,8 +61,16 @@ export async function POST(request) {
       return NextResponse.json(authCheck.error, { status: authCheck.status });
     }
 
+    const { searchParams } = new URL(request.url);
+    const productId = searchParams.get('product') || DEFAULT_PRODUCT_ID;
+    
+    if (!isValidProduct(productId)) {
+      return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
+    }
+
+    const colName = getCollectionName(productId, 'paymentHistory');
     const paymentData = await request.json();
-    console.log('Adding payment record:', paymentData);
+    console.log(`Adding payment record to ${colName}:`, paymentData);
     
     const record = {
       ...paymentData,
@@ -63,7 +78,7 @@ export async function POST(request) {
       updatedAt: new Date().toISOString()
     };
     
-    const docRef = await addDoc(collection(db, 'paymentHistory'), record);
+    const docRef = await addDoc(collection(db, colName), record);
     console.log('Payment record added with ID:', docRef.id);
     
     return NextResponse.json({ id: docRef.id, ...record }, { status: 201 });

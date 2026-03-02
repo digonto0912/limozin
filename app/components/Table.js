@@ -49,6 +49,7 @@ export default function Table({
   showColorInfo = false,
   onColorInfoClose,
   highlightEnabled = true,
+  productId,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("name");
@@ -366,6 +367,7 @@ export default function Table({
         person={paymentHistoryModal.person}
         isOpen={paymentHistoryModal.isOpen}
         onClose={closePaymentHistoryModal}
+        productId={productId}
       />
     </div>
   );

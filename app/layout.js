@@ -1,6 +1,7 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from './contexts/AuthContext';
+import Sidebar from './components/Sidebar';
 
 // Import Firebase init fix to prevent auto-initialization
 if (typeof window !== 'undefined') {
@@ -53,7 +54,12 @@ export default function RootLayout({ children }) {
       </head>
       <body className={inter.className}>
         <AuthProvider>
-          {children}
+          <div className="app-layout">
+            <Sidebar />
+            <div className="app-main">
+              {children}
+            </div>
+          </div>
         </AuthProvider>
       </body>
     </html>

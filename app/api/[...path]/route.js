@@ -32,23 +32,27 @@ const logAPIResponse = (method, path, status, data, error) => {
   });
 };
 
-export async function GET(request, { params }) {
+export async function GET(request, props) {
+  const params = await props.params;
   return handleRequest(request, params, 'GET');
 }
 
-export async function POST(request, { params }) {
+export async function POST(request, props) {
+  const params = await props.params;
   return handleRequest(request, params, 'POST');
 }
 
-export async function PUT(request, { params }) {
+export async function PUT(request, props) {
+  const params = await props.params;
   return handleRequest(request, params, 'PUT');
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request, props) {
+  const params = await props.params;
   return handleRequest(request, params, 'DELETE');
 }
 
-async function handleRequest(request, { params }, method) {
+async function handleRequest(request, params, method) {
   // Log incoming request
   logAPIRequest(method, params, request.url);
 
