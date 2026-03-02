@@ -3,6 +3,10 @@ import { useState, useEffect } from "react";
 import { useParams, redirect } from "next/navigation";
 import {
   InformationCircleIcon,
+  ArrowDownTrayIcon,
+  PlusIcon,
+  SwatchIcon,
+  NoSymbolIcon,
 } from "@heroicons/react/24/outline";
 import Chart from "../../components/Chart";
 import Table from "../../components/Table";
@@ -615,13 +619,7 @@ export default function ProductDashboard() {
             <div className="card">
               <div className="card-header">
                 <h2>Records</h2>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "0.75rem",
-                    alignItems: "center",
-                  }}
-                >
+                <div className="card-header-actions">
                   <button
                     className={`btn btn-light ${
                       isDownloading || records.length === 0 ? "opacity-50" : ""
@@ -635,14 +633,9 @@ export default function ProductDashboard() {
                         ? "Downloading..."
                         : "Download all data as CSV and JSON files"
                     }
-                    style={{ height: "38px" }}
                   >
-                    <img
-                      src="/file.png"
-                      alt="Download"
-                      className="w-5 h-5 mr-2"
-                    />
-                    {isDownloading ? "Downloading..." : "Download Data"}
+                    <ArrowDownTrayIcon className="w-5 h-5" />
+                    <span className="btn-text">{isDownloading ? "Downloading..." : "Download Data"}</span>
                   </button>
                   <button
                     className={`btn btn-light ${
@@ -654,47 +647,31 @@ export default function ProductDashboard() {
                         ? "Turn off highlighting"
                         : "Turn on highlighting"
                     }
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: "38px",
-                    }}
                   >
-                    <img
-                      src={highlightEnabled ? "/stop.png" : "/color.png"}
-                      alt="Highlight"
-                      className="w-5 h-5"
-                    />
-                    {highlightEnabled
-                      ? "Stop highlighting"
-                      : "Start highlighting"}
+                    {highlightEnabled ? (
+                      <NoSymbolIcon className="w-5 h-5" />
+                    ) : (
+                      <SwatchIcon className="w-5 h-5" />
+                    )}
+                    <span className="btn-text">
+                      {highlightEnabled ? "Stop highlighting" : "Start highlighting"}
+                    </span>
                   </button>
                   <button
                     className="btn btn-light"
                     onClick={() => setShowColorInfo(true)}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      height: "38px",
-                    }}
+                    title="Color Info"
                   >
                     <InformationCircleIcon className="w-5 h-5" />
-                    <span>Color Info</span>
+                    <span className="btn-text">Color Info</span>
                   </button>
                   <button
                     className="btn btn-primary"
                     onClick={handleAddRecord}
-                    style={{ height: "38px" }}
+                    title="Add New Record"
                   >
-                    <img
-                      src="/add-icon.png"
-                      alt="Add"
-                      style={{ filter: "invert(100%)" }}
-                      className="w-5 h-5 mr-2"
-                    />
-                    Add New Record
+                    <PlusIcon className="w-5 h-5" />
+                    <span className="btn-text">Add New Record</span>
                   </button>
                 </div>
               </div>

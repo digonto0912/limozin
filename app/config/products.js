@@ -8,6 +8,7 @@ export const PRODUCTS = [
     shortName: 'SWL',
     color: '#4361ee',
     icon: '🚗',
+    logo: '/save-way-limousine.png',
     description: 'Limousine services management',
     collections: {
       records: 'records',              // Keep existing collection for backward compat
@@ -20,6 +21,7 @@ export const PRODUCTS = [
     shortName: 'RRN',
     color: '#10b981',
     icon: '📦',
+    logo: '/RRN.png',
     description: 'Trading and contracting operations',
     collections: {
       records: 'rrn_records',
@@ -32,6 +34,7 @@ export const PRODUCTS = [
     shortName: 'SST',
     color: '#8b5cf6',
     icon: '✈️',
+    logo: '/SKT.png',
     description: 'Trading and contracting operations',
     collections: {
       records: 'save_sky_records',
@@ -44,6 +47,7 @@ export const PRODUCTS = [
     shortName: 'CBD',
     color: '#f59e0b',
     icon: '🚚',
+    logo: '/CBD.png',
     description: 'Delivery services management',
     collections: {
       records: 'city_block_records',

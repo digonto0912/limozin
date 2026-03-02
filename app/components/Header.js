@@ -1,17 +1,18 @@
 'use client';
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { logOut } from '../../firebase/auth';
-import { ArrowRightOnRectangleIcon, UserIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { ArrowRightOnRectangleIcon, UserIcon, Cog6ToothIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import AdminPanel from './AdminPanel';
 import { getProductById } from '../config/products';
 
 export default function Header({ productId }) {
   const { user, isMasterAdmin } = useAuth();
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -22,13 +23,30 @@ export default function Header({ productId }) {
   })();
   const product = resolvedProductId ? getProductById(resolvedProductId) : null;
 
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+    if (mobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [mobileMenuOpen]);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   const handleLogout = async () => {
     if (window.confirm('Are you sure you want to sign out?')) {
       try {
         const result = await logOut();
         if (result.success) {
           console.log('Sign out successful - reloading page...');
-          // Force a complete page reload to ensure clean state
           window.location.href = '/login';
         } else {
           alert('Failed to sign out. Please try again.');
@@ -46,8 +64,8 @@ export default function Header({ productId }) {
       <nav className="navbar">
         <div className="nav-brand">
           <Image 
-            src="/save-way-limousine.png" 
-            alt="Save Way Limousine Logo" 
+            src={product?.logo || '/save-way-limousine.png'} 
+            alt={product?.name || 'Save Way Limousine'} 
             width={50} 
             height={50} 
             className="nav-logo"
@@ -59,48 +77,99 @@ export default function Header({ productId }) {
         </div>
         
         {user && (
-          <div className="nav-user">
-            <div className="user-info">
-              <UserIcon className="h-5 w-5" />
-              <span className="user-name">{user.displayName || user.email}</span>
-              {isMasterAdmin && (
-                <span className="master-admin-badge">Master Admin</span>
-              )}
-            </div>
-            
-            <div className="nav-actions">
-              {isMasterAdmin && (
-                <button 
-                  onClick={() => setShowAdminPanel(true)}
-                  className="admin-btn"
-                  title="Manage Users"
-                >
-                  <Cog6ToothIcon className="h-5 w-5" />
-                  Admin Panel
-                </button>
-              )}
+          <>
+            {/* Desktop / Tablet user area */}
+            <div className="nav-user nav-user-desktop">
+              <div className="user-info">
+                <UserIcon className="h-5 w-5" />
+                <span className="user-name">{user.displayName || user.email}</span>
+                {isMasterAdmin && (
+                  <span className="master-admin-badge">Master Admin</span>
+                )}
+              </div>
               
-              <button 
-                onClick={handleLogout}
-                className="logout-btn"
-                title="Sign out"
-              >
-                <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                Sign Out
-              </button>
+              <div className="nav-actions">
+                {isMasterAdmin && (
+                  <button 
+                    onClick={() => setShowAdminPanel(true)}
+                    className="admin-btn"
+                    title="Manage Users"
+                  >
+                    <Cog6ToothIcon className="h-5 w-5" />
+                    <span className="btn-label">Admin Panel</span>
+                  </button>
+                )}
+                
+                <button 
+                  onClick={handleLogout}
+                  className="logout-btn"
+                  title="Sign out"
+                >
+                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                  <span className="btn-label">Sign Out</span>
+                </button>
+              </div>
             </div>
-          </div>
+
+            {/* Mobile user menu */}
+            <div className="nav-user-mobile" ref={mobileMenuRef}>
+              {isMasterAdmin && (
+                <span className="master-admin-badge master-admin-badge-mobile">Admin</span>
+              )}
+              <button 
+                className="nav-mobile-toggle"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="User menu"
+              >
+                <EllipsisVerticalIcon className="h-6 w-6" />
+              </button>
+              
+              {mobileMenuOpen && (
+                <div className="nav-mobile-dropdown">
+                  <div className="nav-mobile-user-info">
+                    <UserIcon className="h-5 w-5" />
+                    <div className="nav-mobile-user-details">
+                      <span className="nav-mobile-user-name">{user.displayName || user.email}</span>
+                      {isMasterAdmin && (
+                        <span className="master-admin-badge">Master Admin</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="nav-mobile-divider" />
+                  
+                  {isMasterAdmin && (
+                    <button 
+                      onClick={() => { setShowAdminPanel(true); setMobileMenuOpen(false); }}
+                      className="nav-mobile-action"
+                    >
+                      <Cog6ToothIcon className="h-5 w-5" />
+                      Admin Panel
+                    </button>
+                  )}
+                  
+                  <button 
+                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                    className="nav-mobile-action nav-mobile-action-danger"
+                  >
+                    <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </nav>
-      
-      {/* Admin Panel Modal */}
-      {showAdminPanel && (
-        <AdminPanel 
-          isOpen={showAdminPanel}
-          onClose={() => setShowAdminPanel(false)}
-        />
-      )}
     </header>
+      
+    {/* Admin Panel Modal */}
+    {showAdminPanel && (
+      <AdminPanel 
+        isOpen={showAdminPanel}
+        onClose={() => setShowAdminPanel(false)}
+      />
+    )}
     </>
   );
 }

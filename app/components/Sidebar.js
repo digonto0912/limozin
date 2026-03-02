@@ -1,9 +1,10 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { PRODUCTS } from '../config/products';
 import { useAuth } from '../contexts/AuthContext';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { Bars3BottomLeftIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useState, useEffect } from 'react';
 
 export default function Sidebar() {
@@ -48,19 +49,36 @@ export default function Sidebar() {
         <div className="sidebar-header">
           {!collapsed && (
             <div className="sidebar-brand">
-              <span className="sidebar-brand-icon">🏢</span>
+              <Image
+                src="/save-way-limousine.png"
+                alt="Save Way"
+                width={32}
+                height={32}
+                className="sidebar-brand-logo"
+              />
               <div className="sidebar-brand-text">
                 <h3>Save Way</h3>
                 <span className="sidebar-brand-subtitle">Products</span>
               </div>
             </div>
           )}
+          
+          {/* Desktop collapse button */}
           <button
-            className="sidebar-collapse-btn"
+            className="sidebar-collapse-btn sidebar-collapse-btn-desktop"
             onClick={() => setCollapsed(!collapsed)}
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            {collapsed ? <ChevronRightIcon className="h-4 w-4" /> : <ChevronLeftIcon className="h-4 w-4" />}
+            {collapsed ? <Bars3Icon className="h-5 w-5" /> : <Bars3BottomLeftIcon className="h-5 w-5" />}
+          </button>
+
+          {/* Mobile close button */}
+          <button
+            className="sidebar-close-btn-mobile"
+            onClick={() => setMobileOpen(false)}
+            aria-label="Close sidebar"
+          >
+            ✕
           </button>
         </div>
 
@@ -86,11 +104,17 @@ export default function Sidebar() {
                 <span
                   className="sidebar-nav-icon"
                   style={{ 
-                    backgroundColor: isActive ? product.color : 'transparent',
-                    borderColor: product.color
+                    borderColor: isActive ? product.color : 'rgba(255,255,255,0.15)',
+                    boxShadow: isActive ? `0 0 0 2px ${product.color}33` : 'none'
                   }}
                 >
-                  {product.icon}
+                  <Image
+                    src={product.logo}
+                    alt={product.shortName}
+                    width={28}
+                    height={28}
+                    className="sidebar-nav-logo"
+                  />
                 </span>
                 {!collapsed && (
                   <div className="sidebar-nav-text">
